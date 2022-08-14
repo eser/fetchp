@@ -9,7 +9,7 @@ enum UseFetchpStatus {
   SUCCESS = "success",
 }
 
-const useFetchp = function useFetchp<T = any>(
+const useFetchp = function useFetchpMock<T = any>(
   method: string,
   url: string,
   autoFetch: boolean = true,
@@ -25,7 +25,7 @@ const useFetchp = function useFetchp<T = any>(
       return;
     }
 
-    const fetchData = async () => {
+    const fetchData = async function fetchDataMock() {
       setError(undefined);
       setStatus(UseFetchpStatus.LOADING);
 

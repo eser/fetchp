@@ -16,19 +16,19 @@ let mockResponseFn = (request: Request) => Promise.resolve(new Response());
 
 // implementation (public)
 // -----------------------
-const getBaseUrl = function getBaseUrl() {
+const getBaseUrl = function getBaseUrlMock() {
   return baseUrl;
 };
 
-const setBaseUrl = function setBaseUrl(url: string) {
+const setBaseUrl = function setBaseUrlMock(url: string) {
   baseUrl = url;
 };
 
-const getMockUrlContent = function getMockUrlContent(url: string) {
+const getMockUrlContent = function getMockUrlContentMock(url: string) {
   return mockUrlContents.get(url);
 };
 
-const setMockUrlContent = function setMockUrlContent(
+const setMockUrlContent = function setMockUrlContentMock(
   url: string,
   content?: Response,
 ) {
@@ -41,27 +41,27 @@ const setMockUrlContent = function setMockUrlContent(
   mockUrlContents.set(url, content);
 };
 
-const getDynamicRequestHeadersFn = function getDynamicRequestHeadersFn() {
+const getDynamicRequestHeadersFn = function getDynamicRequestHeadersFnMock() {
   return dynamicRequestHeadersFn;
 };
 
-const setDynamicRequestHeadersFn = function setDynamicRequestHeadersFn(
+const setDynamicRequestHeadersFn = function setDynamicRequestHeadersFnMock(
   headersFn: (headers: Headers) => Promise<void>,
 ) {
   dynamicRequestHeadersFn = headersFn;
 };
 
-const getMockResponseFn = function getMockResponseFn() {
+const getMockResponseFn = function getMockResponseFnMock() {
   return mockResponseFn;
 };
 
-const setMockResponseFn = function setMockResponseFn(
+const setMockResponseFn = function setMockResponseFnMock(
   responseFn: (request: Request) => Promise<Response>,
 ) {
   mockResponseFn = responseFn;
 };
 
-const request = function request<T = any>(
+const request = function requestMock<T = any>(
   method: string,
   url: string,
   init?: RequestInit,

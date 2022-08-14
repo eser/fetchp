@@ -1,5 +1,6 @@
 import dts from "rollup-plugin-dts";
 import esbuild from "rollup-plugin-esbuild";
+// import { nodeResolve } from "@rollup/plugin-node-resolve";
 import pkg from "./package.json";
 
 const externals = [
@@ -7,10 +8,14 @@ const externals = [
   ...Object.keys(pkg.peerDependencies || {}),
 ];
 
+const globalPlugins = [
+  // nodeResolve(),
+];
+
 export default [
   {
     input: "src/index.ts",
-    plugins: [esbuild()],
+    plugins: [...globalPlugins, esbuild()],
     external: externals,
     output: [
       {
@@ -29,7 +34,7 @@ export default [
   },
   {
     input: "src/index.ts",
-    plugins: [dts()],
+    plugins: [...globalPlugins, dts()],
     external: externals,
     output: [
       {
@@ -44,7 +49,7 @@ export default [
   },
   {
     input: "src/index.mock.ts",
-    plugins: [esbuild()],
+    plugins: [...globalPlugins, esbuild()],
     external: externals,
     output: [
       {
@@ -63,7 +68,7 @@ export default [
   },
   {
     input: "src/index.mock.ts",
-    plugins: [dts()],
+    plugins: [...globalPlugins, dts()],
     external: externals,
     output: [
       {

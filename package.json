@@ -2,7 +2,7 @@
   "name": "fetchp",
   "description": "",
   "keywords": [],
-  "version": "0.0.14",
+  "version": "0.0.15",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
@@ -20,17 +20,33 @@
     "url": "https://github.com/eserozvataf/fetchp/issues"
   },
   "license": "Apache-2.0",
-  "main": "./index.js",
-  "module": "./mod.js",
-  "types": "./index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/mod.js",
+      "require": "./dist/index.js"
+    },
+    "./mock": {
+      "import": "./dist/mod.mock.js",
+      "require": "./dist/index.mock.js"
+    }
+  },
+  "files": [
+    "./dist/*",
+    "LICENSE",
+    "*.md"
+  ],
   "scripts": {
     "start": "npm run build",
     "build": "rollup -c",
     "test": "jest",
-    "pub": "rm -rf ./dist/ && rollup -c && cp ./LICENSE ./*.md ./package.json ./dist/ && npm publish ./dist/",
+    "pub": "rm -rf ./dist/ && rollup -c && npm publish",
     "cleanup": "rm -rf ./dist/"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/jest": "^28.1.6",
     "@types/react": "^18.0.17",
     "jest": "^28.1.3",

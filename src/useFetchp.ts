@@ -25,7 +25,7 @@ const useFetchp = function useFetchp<T = any>(
       return;
     }
 
-    const fetchData = async () => {
+    const fetchData = async function fetchData() {
       setError(undefined);
       setStatus(UseFetchpStatus.LOADING);
 
