@@ -1,19 +1,35 @@
 {
   "name": "fetchp",
-  "version": "0.0.5",
   "description": "",
-  "main": "dist/index.js",
-  "module": "dist/mod.js",
-  "types": "dist/index.d.ts",
+  "keywords": [],
+  "version": "0.0.14",
+  "homepage": "https://github.com/eserozvataf/fetchp#readme",
+  "author": "Eser Ozvataf <eser@ozvataf.com>",
+  "contributors": [
+    {
+      "name": "Eser Ozvataf",
+      "email": "eser@ozvataf.com",
+      "url": "http://eser.ozvataf.com/"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eserozvataf/fetchp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eserozvataf/fetchp/issues"
+  },
+  "license": "Apache-2.0",
+  "main": "./index.js",
+  "module": "./mod.js",
+  "types": "./index.d.ts",
   "scripts": {
     "start": "npm run build",
     "build": "rollup -c",
     "test": "jest",
-    "publish": "cp package.json dist/ && npm publish dist/",
-    "cleanup": "rm -rf dist/"
+    "pub": "rm -rf ./dist/ && rollup -c && cp ./LICENSE ./*.md ./package.json ./dist/ && npm publish ./dist/",
+    "cleanup": "rm -rf ./dist/"
   },
-  "author": "Eser Ozvataf <eser@ozvataf.com>",
-  "license": "Apache-2.0",
   "devDependencies": {
     "@types/jest": "^28.1.6",
     "@types/react": "^18.0.17",

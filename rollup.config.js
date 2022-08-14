@@ -14,13 +14,13 @@ export default [
     external: externals,
     output: [
       {
-        file: pkg.main, // dist/index.js
+        file: "dist/index.js",
         format: "cjs",
         sourcemap: true,
         exports: "named",
       },
       {
-        file: pkg.module, // dist/mod.js
+        file: "dist/mod.js",
         format: "esm",
         sourcemap: true,
         exports: "named",
