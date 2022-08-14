@@ -18,7 +18,7 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.16",
+  "version": "0.0.17",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [

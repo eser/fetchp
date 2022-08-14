@@ -1,17 +1,13 @@
-# 💬 [fetchp](https://github.com/eserozvataf/fetchp)
+# 💬 [fetchp/fetch+](https://github.com/eserozvataf/fetchp)
 
-[![build status][build-image]][build-url] [![npm version][npm-image]][npm-url]
+[![npm version][npm-image]][npm-url]
 [![npm download][npm-download-image]][npm-url]
-[![dependencies][dep-image]][dep-url]
-[![coverage status][coverage-image]][coverage-url]
-[![license][license-image]][license-url]
-
-## What is the fetchp?
-
-Still work in progress...
+[![dependencies][dep-image]][dep-url] [![license][license-image]][license-url]
 
 ## Table of Contents
 
+- [What is the fetchp/fetch+?](#what-is-the-fetchpfetch)
+- [Why? What's the motivation?](#why-whats-the-motivation)
 - [Quick start](#quick-start)
 - [Usage](#usage)
   - [Basic HTTP Request For Text-Based Data](#basic-http-request-for-text-based-data)
@@ -27,6 +23,51 @@ Still work in progress...
 - [License](#license)
 - [Contributing](#contributing)
 - [To Support](#to-support)
+
+## What is the fetchp/fetch+?
+
+**fetchp** is "not an another HTTP client but a fetch wrapper with fluent API
+and superpowers". The trailing "p" is a means for "plus".
+
+### Why? What's the motivation?
+
+[fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) is a
+standard Web API has already been supported by modern browsers, Deno, node.js,
+bun and etc.
+
+We don't need another HTTP client. Still, a web API's target audience is very
+broad. APIs like fetch are being designed carefully by the community and
+organizations to be used by the general public. Any design mistake can cause
+lots of unrecoverable problems. For this reason, they're keeping it simple and
+running away from the idea of increasing the extra features they can cover.
+
+So, if you want to use fetch, you may need to wrap it with some extra
+functionality time to time. For example, if you call it from a React web
+project, checking its loading state almost is a must. Or, if you're writing
+automated tests for your application, you need to mock the fetch API.
+
+This is where fetchp comes into play. It still using fetch's native
+implementation that brought you by browsers or runtimes themselves, but in the
+meantime, it wraps the fetch to provide extra functionality for developers.
+
+Fetchp tries to assemble some tools that are useful and reusable for most of the
+projects that fetch doesn't provide.
+
+Moreover, since fetchp is a JavaScript module / npm package, it also follows the
+semantic versioning and its API can be evolved in the future without breaking
+any project.
+
+## Superpowers
+
+- [x] Fluent API
+- [x] React Hooks API
+- [x] Abortable requests
+- [x] Testing-friendly
+- [x] Mocking response for requests (not just for tests)
+- [x] Setting Base URL
+- [x] Automatic deserialization/parsing by content-types
+
+More to come see [Todo List](#todo-list) section.
 
 ## Quick start
 
@@ -157,7 +198,11 @@ import { useEffect } from "react";
 import { useFetchp } from "fetchp";
 
 function MyComponent(props) {
-  const { data, status, isSuccess, doFetch } = useFetchp("GET", "/posts", false);
+  const { data, status, isSuccess, doFetch } = useFetchp(
+    "GET",
+    "/posts",
+    false,
+  );
 
   useEffect(() => {
     // fetch data after 500 milliseconds has passed
@@ -181,6 +226,8 @@ See [GitHub Projects](https://github.com/eserozvataf/fetchp/projects) for more.
 - [ ] Protobuf support
 - [ ] Registering serializers / deserializers by content-type
 - [ ] Multiple instances of fetchp
+- [ ] Logging adapters
+- [ ] MAYBE: Reducers / Actions?
 
 ## Requirements
 
@@ -206,14 +253,10 @@ modules are welcome.
 
 [Visit my patreon profile at patreon.com/eserozvataf](https://www.patreon.com/eserozvataf)
 
-[build-image]: https://img.shields.io/travis/eserozvataf/fetchp.svg?style=flat-square
-[build-url]: https://travis-ci.org/eserozvataf/fetchp
 [npm-image]: https://img.shields.io/npm/v/fetchp.svg?style=flat-square
 [npm-download-image]: https://img.shields.io/npm/dt/fetchp.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/fetchp
 [dep-image]: https://img.shields.io/david/eserozvataf/fetchp.svg?style=flat-square
 [dep-url]: https://github.com/eserozvataf/fetchp
-[coverage-image]: https://img.shields.io/codecov/c/github/eserozvataf/fetchp.svg?style=flat-square
-[coverage-url]: https://codecov.io/gh/eserozvataf/fetchp
 [license-image]: https://img.shields.io/npm/l/fetchp.svg?style=flat-square
 [license-url]: https://github.com/eserozvataf/fetchp/blob/master/LICENSE
