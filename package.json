@@ -1,13 +1,13 @@
 {
   "name": "fetchp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
+  "module": "dist/mod.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "npm run build && npm run build:types",
-    "build": "esbuild ./src/index.ts --bundle --minify --sourcemap --platform=node --target=node16 --external:./node_modules/* --outdir=dist/",
-    "build:types": "tsc --emitDeclarationOnly",
+    "start": "npm run build",
+    "build": "rollup -c",
     "test": "jest",
     "cleanup": "rm -rf dist/"
   },
@@ -16,8 +16,11 @@
   "devDependencies": {
     "@types/jest": "^28.1.6",
     "@types/react": "^18.0.17",
-    "esbuild": "^0.15.2",
     "jest": "^28.1.3",
+    "react": "^18.2.0",
+    "rollup": "^2.78.0",
+    "rollup-plugin-dts": "^4.2.2",
+    "rollup-plugin-esbuild": "^4.9.2",
     "ts-jest": "^28.0.7",
     "typescript": "^4.7.4"
   },

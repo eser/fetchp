@@ -16,7 +16,7 @@ const useFetchp = function useFetchp<T = any>(
 ) {
   const [data, setData] = useState<T>();
   const [status, setStatus] = useState<UseFetchpStatus>(UseFetchpStatus.IDLE);
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<unknown | undefined>();
   const [result, setResult] = useState<FetchpResult>();
   const [doFetch, setDoFetch] = useState(autoFetch);
 

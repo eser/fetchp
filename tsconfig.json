@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "strict": false,
-    "target": "ES5",
+    "strict": true,
+    "target": "ES2015",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "esModuleInterop": true,
@@ -12,6 +12,7 @@
     "declaration": true,
     "declarationMap": false,
     "isolatedModules": true,
+    "skipLibCheck": true,
     "sourceMap": false,
     "rootDir": "./src",
     "outDir": "./dist",
