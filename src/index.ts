@@ -1,11 +1,18 @@
-import { type Fetchp, fetchp, type FetchpResult } from "./fetchp";
-import { useFetchp, type UseFetchpStatus } from "./useFetchp";
+import {
+  Fetchp,
+  fetchp,
+  type FetchpInterface,
+  type FetchpResultInterface,
+} from "./fetchp";
+import { useFetchp, useFetchpBuilder, type UseFetchpStatus } from "./useFetchp";
 
 export {
-  type Fetchp,
+  Fetchp,
   fetchp,
   fetchp as default,
-  type FetchpResult,
+  type FetchpInterface,
+  type FetchpResultInterface,
   useFetchp,
+  useFetchpBuilder,
   type UseFetchpStatus,
 };

@@ -1,17 +1,22 @@
 import {
-  type Fetchp,
+  Fetchp,
   fetchp,
-  type FetchpMock,
-  type FetchpResult,
+  type FetchpInterface,
+  type FetchpResultInterface,
 } from "./fetchp.mock";
-import { useFetchp, type UseFetchpStatus } from "./useFetchp.mock";
+import {
+  useFetchp,
+  useFetchpBuilder,
+  type UseFetchpStatus,
+} from "./useFetchp.mock";
 
 export {
-  type Fetchp,
+  Fetchp,
   fetchp,
   fetchp as default,
-  type FetchpMock,
-  type FetchpResult,
+  type FetchpInterface,
+  type FetchpResultInterface,
   useFetchp,
+  useFetchpBuilder,
   type UseFetchpStatus,
 };

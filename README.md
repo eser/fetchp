@@ -67,6 +67,7 @@ any project.
 - [x] Mocking response for requests (not just for tests)
 - [x] Setting Base URL
 - [x] Automatic deserialization/parsing by content-types
+- [x] Multiple instances of fetchp
 
 More to come see [Todo List](#todo-list) section.
 
@@ -246,7 +247,6 @@ See [GitHub Projects](https://github.com/eserozvataf/fetchp/projects) for more.
 - [ ] Add support for middlewares / interceptors
 - [ ] Protobuf support
 - [ ] Registering serializers / deserializers by content-type
-- [ ] Multiple instances of fetchp
 - [ ] Logging adapters
 - [ ] MAYBE: Reducers / Actions?
 

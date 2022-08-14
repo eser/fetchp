@@ -1,142 +1,46 @@
-import { type Fetchp, type FetchpResult } from "./fetchp";
+import {
+  Fetchp,
+  type FetchpInterface,
+  type FetchpResultInterface,
+} from "./fetchp";
 
 // interface definitions
 // ---------------------
-interface FetchpMock extends Fetchp {
-  getMockResponseFn(): (request: Request) => Promise<Response>;
+interface FetchpInterfaceMock extends FetchpInterface {
+  mockResponseFn: (request: Request) => Promise<Response>;
+
   setMockResponseFn(responseFn: (request: Request) => Promise<Response>): void;
 }
 
-// underlying members (private)
-// ------------------------------
-let baseUrl = "";
-let dynamicRequestHeadersFn = (headers: Headers) => Promise.resolve();
-const mockUrlContents = new Map<string, Response>();
-let mockResponseFn = (request: Request) => Promise.resolve(new Response());
-
 // implementation (public)
 // -----------------------
-const getBaseUrl = function getBaseUrlMock() {
-  return baseUrl;
-};
+class FetchpMock extends Fetchp implements FetchpInterfaceMock {
+  mockResponseFn: (request: Request) => Promise<Response>;
 
-const setBaseUrl = function setBaseUrlMock(url: string) {
-  baseUrl = url;
-};
+  constructor() {
+    super();
 
-const getMockUrlContent = function getMockUrlContentMock(url: string) {
-  return mockUrlContents.get(url);
-};
-
-const setMockUrlContent = function setMockUrlContentMock(
-  url: string,
-  content?: Response,
-) {
-  if (content === undefined) {
-    mockUrlContents.delete(url);
-
-    return;
+    this.mockResponseFn = (request: Request) => Promise.resolve(new Response());
   }
 
-  mockUrlContents.set(url, content);
-};
-
-const getDynamicRequestHeadersFn = function getDynamicRequestHeadersFnMock() {
-  return dynamicRequestHeadersFn;
-};
-
-const setDynamicRequestHeadersFn = function setDynamicRequestHeadersFnMock(
-  headersFn: (headers: Headers) => Promise<void>,
-) {
-  dynamicRequestHeadersFn = headersFn;
-};
-
-const getMockResponseFn = function getMockResponseFnMock() {
-  return mockResponseFn;
-};
-
-const setMockResponseFn = function setMockResponseFnMock(
-  responseFn: (request: Request) => Promise<Response>,
-) {
-  mockResponseFn = responseFn;
-};
-
-const request = function requestMock<T = any>(
-  method: string,
-  url: string,
-  init?: RequestInit,
-): FetchpResult<T> {
-  const requestUrl = `${baseUrl}${url}`;
-
-  const headers = new Headers(init?.headers);
-  if (!headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
+  setMockResponseFn(responseFn: (request: Request) => Promise<Response>) {
+    this.mockResponseFn = responseFn;
   }
 
-  const abortController = new AbortController();
-
-  const response = dynamicRequestHeadersFn(headers).then(() => {
-    const requestInit = {
-      method,
-      signal: abortController.signal,
-      ...(init ?? {}),
-      headers,
-    };
-
-    // console.log("[request]", requestUrl, requestInit);
-
-    const mockUrlContent = mockUrlContents.get(url) ??
-      mockUrlContents.get(requestUrl);
-    if (mockUrlContent !== undefined) {
-      return Promise.resolve(mockUrlContent);
-    }
-
+  internalFetcher(requestUrl: string, requestInit: RequestInit) {
     const request = new Request(requestUrl, requestInit);
 
-    return mockResponseFn(request);
-  });
+    return this.mockResponseFn(request);
+  }
+}
 
-  const result = {
-    response,
-    abortController,
-
-    data: response.then((res) => {
-      const contentType = res.headers.get("content-type");
-
-      if (contentType !== null && contentType.startsWith("application/json")) {
-        return res.json() as Promise<T>;
-      }
-
-      return res.text() as unknown as Promise<T>;
-    }),
-  };
-
-  return result;
-};
-
-// this object is our public interface of the cloudstore service
-// since it will be exported, it's important not to contain any
-// private methods or dependencies from external libraries
-const fetchp: FetchpMock = {
-  getBaseUrl,
-  setBaseUrl,
-
-  getMockUrlContent,
-  setMockUrlContent,
-
-  getDynamicRequestHeadersFn,
-  setDynamicRequestHeadersFn,
-
-  getMockResponseFn,
-  setMockResponseFn,
-
-  request,
-};
+// singleton instance for predefined, default fetchp object
+const fetchpMock = new FetchpMock();
 
 export {
-  type Fetchp,
-  fetchp,
-  fetchp as default,
-  type FetchpMock,
-  type FetchpResult,
+  type FetchpInterfaceMock as FetchpInterface,
+  FetchpMock as Fetchp,
+  fetchpMock as default,
+  fetchpMock as fetchp,
+  type FetchpResultInterface,
 };

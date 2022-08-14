@@ -1,19 +1,18 @@
 // interface definitions
 // ---------------------
-interface FetchpResult<T = any> {
+interface FetchpResultInterface<T = any> {
   response: Promise<Response>;
   abortController: AbortController;
   data: Promise<T>;
 }
 
-interface Fetchp {
-  getBaseUrl(): string;
-  setBaseUrl(url: string): void;
+interface FetchpInterface {
+  baseUrl: string;
+  dynamicRequestHeadersFn: (headers: Headers) => Promise<void>;
+  mockUrlContents: Map<string, Response>;
 
-  getMockUrlContent(url: string): Response | undefined;
+  setBaseUrl: (url: string) => void;
   setMockUrlContent(url: string, content?: Response): void;
-
-  getDynamicRequestHeadersFn(): (headers: Headers) => Promise<void>;
   setDynamicRequestHeadersFn(
     headersFn: (headers: Headers) => Promise<void>,
   ): void;
@@ -22,120 +21,103 @@ interface Fetchp {
     method: string,
     url: string,
     init?: RequestInit,
-  ) => FetchpResult<T>;
+  ) => FetchpResultInterface<T>;
 }
-
-// underlying members (private)
-// ------------------------------
-let baseUrl = "";
-let dynamicRequestHeadersFn = (headers: Headers) => Promise.resolve();
-const mockUrlContents = new Map<string, Response>();
 
 // implementation (public)
 // -----------------------
-const getBaseUrl = function getBaseUrl() {
-  return baseUrl;
-};
+class Fetchp implements FetchpInterface {
+  baseUrl: string;
+  dynamicRequestHeadersFn: (headers: Headers) => Promise<void>;
+  mockUrlContents: Map<string, Response>;
 
-const setBaseUrl = function setBaseUrl(url: string) {
-  baseUrl = url;
-};
-
-const getMockUrlContent = function getMockUrlContent(url: string) {
-  return mockUrlContents.get(url);
-};
-
-const setMockUrlContent = function setMockUrlContent(
-  url: string,
-  content?: Response,
-) {
-  if (content === undefined) {
-    mockUrlContents.delete(url);
-
-    return;
+  constructor() {
+    this.baseUrl = "";
+    this.dynamicRequestHeadersFn = (headers: Headers) => Promise.resolve();
+    this.mockUrlContents = new Map<string, Response>();
   }
 
-  mockUrlContents.set(url, content);
-};
-
-const getDynamicRequestHeadersFn = function getDynamicRequestHeadersFn() {
-  return dynamicRequestHeadersFn;
-};
-
-const setDynamicRequestHeadersFn = function setDynamicRequestHeadersFn(
-  headersFn: (headers: Headers) => Promise<void>,
-) {
-  dynamicRequestHeadersFn = headersFn;
-};
-
-const request = function request<T = any>(
-  method: string,
-  url: string,
-  init?: RequestInit,
-): FetchpResult<T> {
-  const requestUrl = `${baseUrl}${url}`;
-
-  const headers = new Headers(init?.headers);
-  if (!headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
+  setBaseUrl(url: string) {
+    this.baseUrl = url;
   }
 
-  const abortController = new AbortController();
+  setDynamicRequestHeadersFn(headersFn: (headers: Headers) => Promise<void>) {
+    this.dynamicRequestHeadersFn = headersFn;
+  }
 
-  const response = dynamicRequestHeadersFn(headers).then(() => {
-    const requestInit = {
-      method,
-      signal: abortController.signal,
-      ...(init ?? {}),
-      headers,
-    };
+  setMockUrlContent(url: string, content?: Response) {
+    if (content === undefined) {
+      this.mockUrlContents.delete(url);
 
-    // console.log("[request]", requestUrl, requestInit);
-
-    const mockUrlContent = mockUrlContents.get(url) ??
-      mockUrlContents.get(requestUrl);
-    if (mockUrlContent !== undefined) {
-      return Promise.resolve(mockUrlContent);
+      return;
     }
 
-    return fetch(
-      requestUrl,
-      requestInit,
-    );
-  });
+    this.mockUrlContents.set(url, content);
+  }
 
-  const result = {
-    response,
-    abortController,
+  internalFetcher(requestUrl: string, requestInit: RequestInit) {
+    return fetch(requestUrl, requestInit);
+  }
 
-    data: response.then((res) => {
-      const contentType = res.headers.get("content-type");
+  internalDataDeserializer<T>(response: Response) {
+    const contentType = response.headers.get("content-type");
 
-      if (contentType !== null && contentType.startsWith("application/json")) {
-        return res.json() as Promise<T>;
+    if (
+      contentType !== null && contentType.startsWith("application/json")
+    ) {
+      return response.json() as Promise<T>;
+    }
+
+    return response.text() as unknown as Promise<T>;
+  }
+
+  request<T = any>(method: string, url: string, init?: RequestInit) {
+    const requestUrl = `${this.baseUrl}${url}`;
+
+    const headers = new Headers(init?.headers);
+    if (!headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+
+    const abortController = new AbortController();
+
+    const response = this.dynamicRequestHeadersFn(headers).then(() => {
+      const requestInit = {
+        method,
+        signal: abortController.signal,
+        ...(init ?? {}),
+        headers,
+      };
+
+      // console.log("[request]", requestUrl, requestInit);
+
+      const mockUrlContent = this.mockUrlContents.get(url) ??
+        this.mockUrlContents.get(requestUrl);
+      if (mockUrlContent !== undefined) {
+        return Promise.resolve(mockUrlContent);
       }
 
-      return res.text() as unknown as Promise<T>;
-    }),
-  };
+      return this.internalFetcher(requestUrl, requestInit);
+    });
 
-  return result;
+    const result = {
+      response,
+      abortController,
+
+      data: response.then((res) => this.internalDataDeserializer<T>(res)),
+    };
+
+    return result;
+  }
+}
+
+// singleton instance for predefined, default fetchp object
+const fetchp = new Fetchp();
+
+export {
+  Fetchp,
+  fetchp,
+  fetchp as default,
+  type FetchpInterface,
+  type FetchpResultInterface,
 };
-
-// this object is our public interface of the cloudstore service
-// since it will be exported, it's important not to contain any
-// private methods or dependencies from external libraries
-const fetchp: Fetchp = {
-  getBaseUrl,
-  setBaseUrl,
-
-  getMockUrlContent,
-  setMockUrlContent,
-
-  getDynamicRequestHeadersFn,
-  setDynamicRequestHeadersFn,
-
-  request,
-};
-
-export { type Fetchp, fetchp, fetchp as default, type FetchpResult };

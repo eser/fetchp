@@ -4,7 +4,7 @@ describe("fetchp", () => {
   test("baseUrl", () => {
     fetchp.setBaseUrl("http://localhost/");
 
-    expect(fetchp.getBaseUrl()).toEqual("http://localhost/");
+    expect(fetchp.baseUrl).toEqual("http://localhost/");
   });
 
   test("mockUrlContent", async () => {
