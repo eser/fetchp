@@ -8,8 +8,11 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
+    "emitDeclarationOnly": false,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
+    "isolatedModules": true,
+    "sourceMap": false,
     "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": "."
