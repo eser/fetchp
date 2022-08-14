@@ -1,6 +1,6 @@
 {
   "name": "fetchp",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/mod.js",
@@ -9,6 +9,7 @@
     "start": "npm run build",
     "build": "rollup -c",
     "test": "jest",
+    "publish": "cp package.json dist/ && npm publish dist/",
     "cleanup": "rm -rf dist/"
   },
   "author": "Eser Ozvataf <eser@ozvataf.com>",

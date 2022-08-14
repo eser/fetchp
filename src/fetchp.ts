@@ -90,7 +90,7 @@ const request = function request<T = any>(
       headers,
     };
 
-    console.log("[request]", requestUrl, requestInit);
+    // console.log("[request]", requestUrl, requestInit);
 
     const mockUrlContent = mockUrlContents.get(url) ??
       mockUrlContents.get(requestUrl);
