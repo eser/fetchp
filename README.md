@@ -2,7 +2,7 @@
 
 [![npm version][npm-image]][npm-url]
 [![npm download][npm-download-image]][npm-url]
-[![dependencies][dep-image]][dep-url] [![license][license-image]][license-url]
+[![license][license-image]][license-url]
 
 ## Table of Contents
 
@@ -17,6 +17,7 @@
   - [Mocking an URL for Request](#mocking-an-url-for-request)
   - [Mocking for Testing (Buggy ATM)](#mocking-for-testing-buggy-atm)
   - [Using with _**React Hooks**_](#using-with-react-hooks)
+  - [Using with _**React Hooks**_, mocking for testing](#using-with-react-hooks-mocking-for-testing)
   - [Using with _**React Hooks**_, manual fetching](#using-with-react-hooks-manual-fetching)
 - [Todo List](#todo-list)
 - [Requirements](#requirements)
@@ -162,9 +163,8 @@ its interfaces / methods. All you need to do is importing `fetchp/mock` instead
 of `fetchp` module.
 
 ```js
-import { fetchp } from "fetchp";
-
-fetchp.setBaseUrl("https://jsonplaceholder.typicode.com");
+// just replace fetchp with fetchp/mock
+import { fetchp } from "fetchp/mock";
 
 const req = fetchp.request("GET", "/posts");
 
@@ -175,6 +175,27 @@ console.log(await req.data);
 
 ```js
 import { useFetchp } from "fetchp";
+
+function MyComponent(props) {
+  const { data, isLoading, error } = useFetchp("GET", "/posts");
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  return <div>{JSON.stringify(data)}</div>;
+}
+```
+
+### Using with _**React Hooks**_, mocking for testing
+
+```js
+// just replace fetchp with fetchp/mock
+import { useFetchp } from "fetchp/mock";
 
 function MyComponent(props) {
   const { data, isLoading, error } = useFetchp("GET", "/posts");
@@ -251,12 +272,10 @@ modules are welcome.
 
 ## To Support
 
-[Visit my patreon profile at patreon.com/eserozvataf](https://www.patreon.com/eserozvataf)
+[Visit my GitHub Sponsors profile at github.com/sponsors/eserozvataf](https://github.com/sponsors/eserozvataf)
 
 [npm-image]: https://img.shields.io/npm/v/fetchp.svg?style=flat-square
 [npm-download-image]: https://img.shields.io/npm/dt/fetchp.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/fetchp
-[dep-image]: https://img.shields.io/david/eserozvataf/fetchp.svg?style=flat-square
-[dep-url]: https://github.com/eserozvataf/fetchp
 [license-image]: https://img.shields.io/npm/l/fetchp.svg?style=flat-square
 [license-url]: https://github.com/eserozvataf/fetchp/blob/master/LICENSE
