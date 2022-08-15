@@ -53,8 +53,8 @@ const config = template(bundles, (bundle) => [
         lib: true,
         file: `${bundle.entry}.d.ts`,
         entries: {
-          [bundle.entry]: {},
-          [`${bundle.entry}.mock`]: {
+          "index": {},
+          "index.mock": {
             as: "mock",
             file: `${bundle.entry}.mock.d.ts`,
           },

@@ -18,7 +18,7 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.21",
+  "version": "0.0.22",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
@@ -41,12 +41,14 @@
   "types": "./dist/esm/mod.d.ts",
   "exports": {
     ".": {
+      "require": "./dist/cjs/index.js",
       "import": "./dist/esm/mod.js",
-      "require": "./dist/cjs/index.js"
+      "types": "./dist/esm/mod.d.ts"
     },
     "./mock": {
+      "require": "./dist/cjs/index.mock.js",
       "import": "./dist/esm/mod.mock.js",
-      "require": "./dist/cjs/index.mock.js"
+      "types": "./dist/esm/mod.mock.d.ts"
     }
   },
   "files": [
