@@ -1,6 +1,10 @@
-import dts from "rollup-plugin-dts";
-import esbuild from "rollup-plugin-esbuild";
-// import { nodeResolve } from "@rollup/plugin-node-resolve";
+import nodeResolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import flatDts from "rollup-plugin-flat-dts";
+import esbuild, { minify } from "rollup-plugin-esbuild";
+import renameFiles from "rollup-plugin-rename-files";
+import multiInput from "rollup-plugin-multi-input";
+import sourcemaps from "rollup-plugin-sourcemaps";
 import pkg from "./package.json";
 
 const externals = [
@@ -9,76 +13,75 @@ const externals = [
 ];
 
 const globalPlugins = [
-  // nodeResolve(),
+  commonjs(),
+  nodeResolve(),
+  multiInput({
+    relative: "dist/tsc/",
+  }),
+  sourcemaps(),
+  minify(),
 ];
 
-export default [
-  {
-    input: "src/index.ts",
-    plugins: [...globalPlugins, esbuild()],
-    external: externals,
-    output: [
-      {
-        file: "dist/index.js",
-        format: "cjs",
-        sourcemap: true,
-        exports: "named",
-      },
-      {
-        file: "dist/mod.js",
-        format: "esm",
-        sourcemap: true,
-        exports: "named",
-      },
-    ],
-  },
-  {
-    input: "src/index.ts",
-    plugins: [...globalPlugins, dts()],
-    external: externals,
-    output: [
-      {
-        file: "dist/index.d.ts",
-        format: "es",
-      },
-      {
-        file: "dist/mod.d.ts",
-        format: "es",
-      },
-    ],
-  },
-  {
-    input: "src/index.mock.ts",
-    plugins: [...globalPlugins, esbuild()],
-    external: externals,
-    output: [
-      {
-        file: "dist/index.mock.js",
-        format: "cjs",
-        sourcemap: true,
-        exports: "named",
-      },
-      {
-        file: "dist/mod.mock.js",
-        format: "esm",
-        sourcemap: true,
-        exports: "named",
-      },
-    ],
-  },
-  {
-    input: "src/index.mock.ts",
-    plugins: [...globalPlugins, dts()],
-    external: externals,
-    output: [
-      {
-        file: "dist/index.mock.d.ts",
-        format: "es",
-      },
-      {
-        file: "dist/mod.mock.d.ts",
-        format: "es",
-      },
-    ],
-  },
+function template(formats, configFn) {
+  return formats.reduce(
+    (acc, curr) => {
+      return [...acc, ...configFn(curr)];
+    },
+    [],
+  );
+}
+
+const bundles = [
+  { format: "cjs", entry: "index" },
+  { format: "esm", entry: "mod" },
 ];
+
+const config = template(bundles, (bundle) => [
+  {
+    input: [
+      {
+        [bundle.entry]: "dist/tsc/index.js",
+        [`${bundle.entry}.mock`]: "dist/tsc/index.mock.js",
+      },
+      "!dist/tsc/**/*.test.js",
+    ],
+    // preserveModules: true,
+    plugins: [
+      ...globalPlugins,
+      esbuild(),
+      flatDts({
+        lib: true,
+        file: `${bundle.entry}.d.ts`,
+        entries: {
+          [bundle.entry]: {},
+          [`${bundle.entry}.mock`]: {
+            as: "mock",
+            file: `${bundle.entry}.mock.d.ts`,
+          },
+        },
+      }),
+      renameFiles({
+        includes: "index.",
+        moduleName: (name) => {
+          if (bundle.entry === "index") {
+            return name;
+          }
+
+          return name.replace("index.", `${bundle.entry}.`);
+        },
+      }),
+    ],
+    external: externals,
+    output: [
+      {
+        dir: `dist/${bundle.format}/`,
+        format: bundle.format,
+        sourcemap: true,
+        chunkFileNames: "[name].js",
+        exports: "named",
+      },
+    ],
+  },
+]);
+
+export default config;

@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "ES2015",
-    "module": "CommonJS",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "allowJs": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": false,
     "forceConsistentCasingInFileNames": true,
     "emitDeclarationOnly": false,
     "declaration": true,
     "declarationMap": false,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "skipLibCheck": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist/tsc",
     "baseUrl": "."
   },
   "include": [
