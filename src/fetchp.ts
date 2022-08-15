@@ -1,6 +1,7 @@
 // interface definitions
 // ---------------------
 interface FetchpResultInterface<T = any> {
+  requestUrl: URL;
   response: Promise<Response>;
   abortController: AbortController;
   data: Promise<T>;
@@ -55,7 +56,7 @@ class Fetchp implements FetchpInterface {
     this.mockUrlContents.set(url, content);
   }
 
-  internalFetcher(requestUrl: string, requestInit: RequestInit) {
+  internalFetcher(requestUrl: URL, requestInit: RequestInit) {
     return fetch(requestUrl, requestInit);
   }
 
@@ -72,7 +73,7 @@ class Fetchp implements FetchpInterface {
   }
 
   request<T = any>(method: string, url: string, init?: RequestInit) {
-    const requestUrl = `${this.baseUrl}${url}`;
+    const requestUrl = new URL(url, this.baseUrl);
 
     const headers = new Headers(init?.headers);
     if (!headers.has("Content-Type")) {
@@ -92,7 +93,7 @@ class Fetchp implements FetchpInterface {
       // console.log("[request]", requestUrl, requestInit);
 
       const mockUrlContent = this.mockUrlContents.get(url) ??
-        this.mockUrlContents.get(requestUrl);
+        this.mockUrlContents.get(requestUrl.toString());
       if (mockUrlContent !== undefined) {
         return Promise.resolve(mockUrlContent);
       }
@@ -101,6 +102,7 @@ class Fetchp implements FetchpInterface {
     });
 
     const result = {
+      requestUrl,
       response,
       abortController,
 

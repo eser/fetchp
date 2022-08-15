@@ -27,7 +27,7 @@ class FetchpMock extends Fetchp implements FetchpInterfaceMock {
     this.mockResponseFn = responseFn;
   }
 
-  internalFetcher(requestUrl: string, requestInit: RequestInit) {
+  internalFetcher(requestUrl: URL, requestInit: RequestInit) {
     const request = new Request(requestUrl, requestInit);
 
     return this.mockResponseFn(request);
