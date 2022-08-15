@@ -18,7 +18,7 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.22",
+  "version": "0.0.23",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
@@ -36,6 +36,7 @@
     "url": "https://github.com/eserozvataf/fetchp/issues"
   },
   "license": "Apache-2.0",
+  "type": "commonjs",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/mod.js",
   "types": "./dist/esm/mod.d.ts",

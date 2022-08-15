@@ -1,7 +1,7 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import flatDts from "rollup-plugin-flat-dts";
-import esbuild, { minify } from "rollup-plugin-esbuild";
+import { minify } from "rollup-plugin-esbuild";
 import renameFiles from "rollup-plugin-rename-files";
 import multiInput from "rollup-plugin-multi-input";
 import sourcemaps from "rollup-plugin-sourcemaps";
@@ -48,7 +48,7 @@ const config = template(bundles, (bundle) => [
     // preserveModules: true,
     plugins: [
       ...globalPlugins,
-      esbuild(),
+      // esbuild(),
       flatDts({
         lib: true,
         file: `${bundle.entry}.d.ts`,
