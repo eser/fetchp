@@ -19,6 +19,7 @@
   - [Using with _**React Hooks**_](#using-with-react-hooks)
   - [Using with _**React Hooks**_, mocking for testing](#using-with-react-hooks-mocking-for-testing)
   - [Using with _**React Hooks**_, manual fetching](#using-with-react-hooks-manual-fetching)
+  - [Using with _**Deno**_](#using-with-deno)
 - [Todo List](#todo-list)
 - [Requirements](#requirements)
 - [License](#license)
@@ -238,6 +239,17 @@ function MyComponent(props) {
   return <div>{status}: {JSON.stringify(data)}</div>;
 }
 ```
+
+### Using with _**Deno**_
+
+```js
+import { fetchp } from "https://esm.sh/fetchp";
+
+const req = fetchp.request("GET", "https://www.google.com/");
+
+console.log(await req.data);
+```
+
 
 ## Todo List
 
