@@ -34,7 +34,7 @@ and superpowers". The trailing "p" is a means for "plus".
 ### Why? What's the motivation?
 
 [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) is a
-standard Web API has already been supported by modern browsers, Deno, node.js,
+standard Web API that's already supported by modern browsers, Deno, node.js,
 bun and etc.
 
 We don't need another HTTP client. Still, a web API's target audience is very
@@ -44,11 +44,11 @@ lots of unrecoverable problems. For this reason, they're keeping it simple and
 running away from the idea of increasing the extra features they can cover.
 
 So, if you want to use fetch, you may need to wrap it with some extra
-functionality time to time. For example, if you call it from a React web
+functionality from time to time. For example, if you call it from a React web
 project, checking its loading state almost is a must. Or, if you're writing
 automated tests for your application, you need to mock the fetch API.
 
-This is where fetchp comes into play. It still using fetch's native
+This is where fetchp comes into play. It still uses fetch's native
 implementation that brought you by browsers or runtimes themselves, but in the
 meantime, it wraps the fetch to provide extra functionality for developers.
 
@@ -116,7 +116,7 @@ setTimeout(() => req.abortController.abort(), 500);
 
 ### Setting a Base URL for Requests
 
-Assume that you're working with single API on the backend, and you don't want to
+Assume that you're working with a single API on the backend, and you don't want to
 repeat yourself by concatenating endpoint URL strings in each request you make.
 
 ```js
@@ -228,7 +228,7 @@ function MyComponent(props) {
   );
 
   useEffect(() => {
-    // fetch data after 500 milliseconds has passed
+    // fetch data after 500 milliseconds have passed
     setTimeout(() => doFetch(), 500);
   }, []);
 
