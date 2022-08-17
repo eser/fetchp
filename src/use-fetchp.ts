@@ -19,7 +19,7 @@ const useFetchpBuilder = function useFetchpBuilder(
     const [status, setStatus] = useState<FetchpStatus>(FetchpStatus.IDLE);
     const [error, setError] = useState<unknown | undefined>();
     const [result, setResult] = useState<FetchpResultInterface>();
-    const [doFetch, setDoFetch] = useState(init?.autoFetch);
+    const [doFetch, setDoFetch] = useState(init?.autoFetch ?? true);
 
     useEffect(() => {
       if (!doFetch) {
