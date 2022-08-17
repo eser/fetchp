@@ -27,19 +27,41 @@ const useFetchpBuilder = function useFetchpBuilder(
       }
 
       const fetchData = async function fetchData() {
+        // try {
+        //   const result = fetchpInstance.request<T>(method, url, {
+        //     ...(init ?? {}),
+        //     autoFetch: true,
+        //     statusCallback: (newStatus) => {
+        //       setStatus(newStatus);
+        //     },
+        //     errorCallback: (newError) => setError(newError),
+        //     successCallback: (newData) => setData(newData),
+        //     // cancelCallback: () => {},
+        //   });
+
+        //   setResult(result);
+        // } catch (error) {
+        //   setError(error);
+        //   console.error(error);
+        //   setStatus(FetchpStatus.ERROR);
+        // }
+
+        setError(undefined);
+        setStatus(FetchpStatus.LOADING);
+
         try {
           const result = fetchpInstance.request<T>(method, url, {
             ...(init ?? {}),
             autoFetch: true,
-            statusCallback: (newStatus) => {
-              setStatus(newStatus);
-            },
-            errorCallback: (newError) => setError(newError),
-            successCallback: (newData) => setData(newData),
-            // cancelCallback: () => {},
           });
 
           setResult(result);
+          setData(await result.data);
+          if (result.abortController.signal.aborted) {
+            setStatus(FetchpStatus.CANCELED);
+          } else {
+            setStatus(FetchpStatus.SUCCESS);
+          }
         } catch (error) {
           setError(error);
           console.error(error);

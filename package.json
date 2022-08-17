@@ -1,6 +1,6 @@
 {
   "name": "fetchp",
-  "description": "",
+  "description": "Not an another HTTP client but a fetch wrapper with fluent API and superpowers",
   "keywords": [
     "fetch",
     "fetchp",
@@ -18,7 +18,7 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.26",
+  "version": "0.0.27",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
