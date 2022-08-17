@@ -39,6 +39,8 @@ class FetchpMock extends Fetchp implements FetchpInterfaceMock {
 // singleton instance for predefined, default fetchp object
 const fetchpMock = new FetchpMock();
 
+export * from "./hook-registry";
+export * from "./mock-registry";
 export {
   type FetchpHookFn,
   FetchpHookType,

@@ -179,7 +179,7 @@ behavior.
 import { fetchp } from "fetchp";
 
 const mockContent = { hello: "world" };
-const mockResponse = new Response(
+const mockResponse = (request) => new Response(
   JSON.stringify(mockContent),
   {
     status: 200,

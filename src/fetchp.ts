@@ -156,7 +156,7 @@ class Fetchp implements FetchpInterface {
           (url) => this.internalUrlConverter(url),
         );
 
-        return Promise.all([req, mock?.responseFn?.(), undefined]);
+        return Promise.all([req, mock?.responseFn?.(req), undefined]);
       })
       .then(([req, res]) => {
         if (res !== undefined) {
@@ -279,6 +279,8 @@ class Fetchp implements FetchpInterface {
 // singleton instance for predefined, default fetchp object
 const fetchp = new Fetchp();
 
+export * from "./hook-registry";
+export * from "./mock-registry";
 export {
   Fetchp,
   fetchp,

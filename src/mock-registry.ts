@@ -4,7 +4,7 @@ interface MockRegistryItem {
   methods: string[];
   requestUrlPattern: string | RegExp;
   isRegExp: boolean;
-  responseFn: () => Response;
+  responseFn: (request: Request) => Response;
 }
 
 interface MockRegistryInterface {
@@ -19,7 +19,10 @@ interface MockRegistryInterface {
   find(
     request: Request,
     urlConverter?: (url: string) => URL,
-  ): { request: Request; responseFn: (() => Response) | undefined };
+  ): {
+    request: Request;
+    responseFn: ((request: Request) => Response) | undefined;
+  };
 }
 
 class MockRegistry implements MockRegistry {
@@ -32,15 +35,15 @@ class MockRegistry implements MockRegistry {
   add(
     methods: string | string[],
     requestUrlPattern: string | RegExp,
-    response: Response | (() => Response),
+    response: Response | ((request: Request) => Response),
   ): void {
     const methods_ = (methods.constructor === Array)
       ? methods
       : [<string> methods];
     const isRegExp = (requestUrlPattern.constructor === RegExp);
     const responseFn = (response.constructor === Function)
-      ? <() => Response> response
-      : () => <Response> response;
+      ? <(request: Request) => Response> response
+      : (_: Request) => <Response> response;
 
     this.items.push({
       methods: methods_,
