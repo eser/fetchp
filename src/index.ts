@@ -1,2 +1,2 @@
 export * from "./fetchp";
-export * from "./useFetchp";
+export { default, useFetchp, useFetchpBuilder } from "./useFetchp";

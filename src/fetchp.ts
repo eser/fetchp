@@ -6,7 +6,11 @@ import {
   HookRegistry,
   type HookRegistryInterface,
 } from "./hook-registry";
-import { MockRegistry, type MockRegistryInterface } from "./mock-registry";
+import {
+  MockRegistry,
+  type MockRegistryInterface,
+  type MockRegistryItem,
+} from "./mock-registry";
 
 enum FetchpStatus {
   IDLE = "idle",
@@ -279,8 +283,6 @@ class Fetchp implements FetchpInterface {
 // singleton instance for predefined, default fetchp object
 const fetchp = new Fetchp();
 
-export * from "./hook-registry";
-export * from "./mock-registry";
 export {
   Fetchp,
   fetchp,
@@ -291,4 +293,9 @@ export {
   type FetchpRequestInit,
   type FetchpResultInterface,
   FetchpStatus,
+  HookRegistry,
+  type HookRegistryInterface,
+  MockRegistry,
+  type MockRegistryInterface,
+  type MockRegistryItem,
 };

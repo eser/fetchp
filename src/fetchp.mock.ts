@@ -1,11 +1,16 @@
 import {
   Fetchp,
   type FetchpHookFn,
-  type FetchpHookType,
+  FetchpHookType,
   type FetchpInterface,
   type FetchpRequestInit,
   type FetchpResultInterface,
   FetchpStatus,
+  HookRegistry,
+  type HookRegistryInterface,
+  MockRegistry,
+  type MockRegistryInterface,
+  type MockRegistryItem,
 } from "./fetchp";
 
 // interface definitions
@@ -39,8 +44,6 @@ class FetchpMock extends Fetchp implements FetchpInterfaceMock {
 // singleton instance for predefined, default fetchp object
 const fetchpMock = new FetchpMock();
 
-export * from "./hook-registry";
-export * from "./mock-registry";
 export {
   type FetchpHookFn,
   FetchpHookType,
@@ -51,4 +54,9 @@ export {
   type FetchpRequestInit,
   type FetchpResultInterface,
   FetchpStatus,
+  HookRegistry,
+  type HookRegistryInterface,
+  MockRegistry,
+  type MockRegistryInterface,
+  type MockRegistryItem,
 };
