@@ -3,12 +3,9 @@ import {
   fetchp,
   type FetchpInterface,
   type FetchpResultInterface,
+  FetchpStatus,
 } from "./fetchp.mock";
-import {
-  useFetchp,
-  useFetchpBuilder,
-  type UseFetchpStatus,
-} from "./useFetchp.mock";
+import { useFetchp, useFetchpBuilder } from "./useFetchp.mock";
 
 export {
   Fetchp,
@@ -16,7 +13,7 @@ export {
   fetchp as default,
   type FetchpInterface,
   type FetchpResultInterface,
+  FetchpStatus,
   useFetchp,
   useFetchpBuilder,
-  type UseFetchpStatus,
 };

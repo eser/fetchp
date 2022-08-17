@@ -14,6 +14,8 @@
   - [Basic HTTP Request For JSON Data](#basic-http-request-for-json-data)
   - [Aborting a Request](#aborting-a-request)
   - [Setting a Base URL for Requests](#setting-a-base-url-for-requests)
+  - [Middlewares / Hooks](#middlewares--hooks)
+  - [On-Demand Fetch](#on-demand-fetch)
   - [Mocking an URL for Request](#mocking-an-url-for-request)
   - [Mocking for Testing (Buggy ATM)](#mocking-for-testing-buggy-atm)
   - [Using with _**React Hooks**_](#using-with-react-hooks)
@@ -68,7 +70,10 @@ any project.
 - [x] Mocking response for requests (not just for tests)
 - [x] Setting Base URL
 - [x] Automatic deserialization/parsing by content-types
+- [x] On-demand fetching
+- [x] Fetch status
 - [x] Multiple instances of fetchp
+- [x] TypeScript Type Support
 
 More to come see [Todo List](#todo-list) section.
 
@@ -106,12 +111,15 @@ console.log(await req.data);
 ### Aborting a Request
 
 ```js
-import { fetchp } from "fetchp";
+import { fetchp, FetchpStatus } from "fetchp";
 
 const req = fetchp.request("GET", "https://jsonplaceholder.typicode.com/posts");
 
 // abort it after 500 milliseconds
 setTimeout(() => req.abortController.abort(), 500);
+
+// you can check status afterwars
+assert(req.status === FetchpStatus.CANCELED);
 ```
 
 ### Setting a Base URL for Requests
@@ -125,6 +133,39 @@ import { fetchp } from "fetchp";
 fetchp.setBaseUrl("https://jsonplaceholder.typicode.com");
 
 const req = fetchp.request("GET", "/posts");
+
+console.log(await req.data);
+```
+
+### Middlewares / Hooks
+
+Assume that you're need to add additional headers to each request you make.
+
+```js
+import { fetchp, FetchpHookType } from "fetchp";
+
+fetchp.hooks.add(
+  FetchpHookType.BuildRequestHeaders,
+  (headers) => headers.set("Authorization", `Bearer ${getIdToken()}`);
+);
+
+const response = fetchp.request(
+  "GET",
+  "https://localhost/api/some-restricted-endpoint"",
+);
+```
+
+### On-Demand Fetching
+
+Assume that you don't want to invoke the request immediately. You'll set up an
+external trigger for this.
+
+```js
+import { fetchp } from "fetchp";
+
+const req = fetchp.request("GET", "/posts", { autoFetch: false });
+
+setTimeout(() => req.exec(), 500);
 
 console.log(await req.data);
 ```
@@ -149,7 +190,7 @@ const mockResponse = new Response(
   },
 );
 
-fetchp.setMockUrlContent("/hello", mockResponse);
+fetchp.mocks.add(["GET", "POST"], "/hello", mockResponse);
 
 // mocking is done, let's make a request to the mocked URL
 const req = fetchp.request("GET", "/hello");
@@ -250,17 +291,17 @@ const req = fetchp.request("GET", "https://www.google.com/");
 console.log(await req.data);
 ```
 
-
 ## Todo List
 
 See [GitHub Projects](https://github.com/eserozvataf/fetchp/projects) for more.
 
 - [ ] Fixing the bug in `fetchp/mock` module
-- [ ] Add support for middlewares / interceptors
+- [ ] Add advanced support for hooks / middlewares / interceptors
 - [ ] Protobuf support
 - [ ] Registering serializers / deserializers by content-type
 - [ ] Logging adapters
 - [ ] MAYBE: Reducers / Actions?
+- [ ] Mechanism for request retries
 
 ## Requirements
 

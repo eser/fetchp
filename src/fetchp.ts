@@ -1,70 +1,87 @@
 // interface definitions
 // ---------------------
+import {
+  type FetchpHookFn,
+  FetchpHookType,
+  HookRegistry,
+  type HookRegistryInterface,
+} from "./hook-registry";
+import { MockRegistry, type MockRegistryInterface } from "./mock-registry";
+
+enum FetchpStatus {
+  IDLE = "idle",
+  LOADING = "loading",
+  ERROR = "error",
+  CANCELED = "canceled",
+  SUCCESS = "success",
+}
+
+interface FetchpRequestInit extends RequestInit {
+  autoFetch?: boolean;
+  statusCallback?: (status: FetchpStatus) => void;
+  successCallback?: (data: any) => void;
+  errorCallback?: (error: unknown) => void;
+  cancelCallback?: () => void;
+}
+
 interface FetchpResultInterface<T = any> {
-  requestUrl: URL;
-  response: Promise<Response>;
+  readonly request: Request | undefined;
+  readonly response: Promise<Response | undefined>;
   abortController: AbortController;
-  data: Promise<T>;
+  readonly status: FetchpStatus;
+  readonly error: unknown | undefined;
+  readonly data: Promise<T | undefined>;
+
+  exec(): FetchpResultInterface<T>;
 }
 
 interface FetchpInterface {
-  baseUrl: string;
-  dynamicRequestHeadersFn: (headers: Headers) => Promise<void>;
-  mockUrlContents: Map<string, Response>;
+  baseUrl: string | undefined;
+  hooks: HookRegistryInterface;
+  mocks: MockRegistryInterface;
 
   setBaseUrl: (url: string) => void;
-  setMockUrlContent(url: string, content?: Response): void;
-  setDynamicRequestHeadersFn(
-    headersFn: (headers: Headers) => Promise<void>,
-  ): void;
 
   request: <T = any>(
     method: string,
     url: string,
-    init?: RequestInit,
+    init?: FetchpRequestInit,
   ) => FetchpResultInterface<T>;
 }
 
 // implementation (public)
 // -----------------------
 class Fetchp implements FetchpInterface {
-  baseUrl: string;
-  dynamicRequestHeadersFn: (headers: Headers) => Promise<void>;
-  mockUrlContents: Map<string, Response>;
+  baseUrl: string | undefined;
+  hooks: HookRegistryInterface;
+  mocks: MockRegistryInterface;
 
   constructor() {
-    this.baseUrl = "";
-    this.dynamicRequestHeadersFn = (headers: Headers) => Promise.resolve();
-    this.mockUrlContents = new Map<string, Response>();
+    this.baseUrl = undefined;
+    this.hooks = new HookRegistry();
+    this.mocks = new MockRegistry();
   }
 
-  setBaseUrl(url: string) {
+  setBaseUrl(url: string | undefined) {
     this.baseUrl = url;
   }
 
-  setDynamicRequestHeadersFn(headersFn: (headers: Headers) => Promise<void>) {
-    this.dynamicRequestHeadersFn = headersFn;
+  internalFetcher(request: Request) {
+    return fetch(request);
   }
 
-  setMockUrlContent(url: string, content?: Response) {
-    if (content === undefined) {
-      this.mockUrlContents.delete(url);
-
-      return;
+  internalDataDeserializer<T>(
+    response: Response | undefined,
+  ): Promise<T | undefined> {
+    if (response === undefined) {
+      return Promise.resolve(undefined);
     }
 
-    this.mockUrlContents.set(url, content);
-  }
-
-  internalFetcher(requestUrl: URL, requestInit: RequestInit) {
-    return fetch(requestUrl, requestInit);
-  }
-
-  internalDataDeserializer<T>(response: Response) {
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers?.get("content-type");
 
     if (
-      contentType !== null && contentType.startsWith("application/json")
+      contentType !== null && contentType !== undefined &&
+      contentType.startsWith("application/json")
     ) {
       return response.json() as Promise<T>;
     }
@@ -72,8 +89,22 @@ class Fetchp implements FetchpInterface {
     return response.text() as unknown as Promise<T>;
   }
 
-  request<T = any>(method: string, url: string, init?: RequestInit) {
-    const requestUrl = new URL(url, this.baseUrl);
+  internalUrlConverter(url: string) {
+    return new URL(url, this.baseUrl);
+  }
+
+  internalAwaiterGenerator<T = unknown>(): [(value: T) => void, Promise<T>] {
+    let resolveFnc: (value: T) => void;
+
+    const promise = new Promise<T>((resolve) => {
+      resolveFnc = resolve;
+    });
+
+    return [resolveFnc!, promise];
+  }
+
+  request<T = any>(method: string, url: string, init?: FetchpRequestInit) {
+    const url_ = this.internalUrlConverter(url);
 
     const headers = new Headers(init?.headers);
     if (!headers.has("Content-Type")) {
@@ -81,33 +112,166 @@ class Fetchp implements FetchpInterface {
     }
 
     const abortController = new AbortController();
+    const [awaiterResolve, awaiter] = this.internalAwaiterGenerator<
+      Response | undefined
+    >();
 
-    const response = this.dynamicRequestHeadersFn(headers).then(() => {
-      const requestInit = {
-        method,
-        signal: abortController.signal,
-        ...(init ?? {}),
-        headers,
-      };
+    let status = FetchpStatus.IDLE;
+    let error: unknown | undefined;
+    let request: Request | undefined;
+    let response: Promise<Response | undefined>;
 
-      // console.log("[request]", requestUrl, requestInit);
+    const promise = awaiter
+      .then(() => {
+        return Promise.all([
+          undefined,
+          undefined,
+          this.hooks.callHook(
+            FetchpHookType.BuildRequestHeaders,
+            headers,
+          ),
+        ]);
+      })
+      .then(() => {
+        // headers
+        const requestInit = {
+          method,
+          signal: abortController.signal,
+          ...(init ?? {}),
+          headers,
+        };
 
-      const mockUrlContent = this.mockUrlContents.get(url) ??
-        this.mockUrlContents.get(requestUrl.toString());
-      if (mockUrlContent !== undefined) {
-        return Promise.resolve(mockUrlContent);
+        request = new Request(url_, requestInit);
+
+        return Promise.all([
+          request,
+          undefined,
+          undefined,
+          this.hooks.callHook(FetchpHookType.NewRequest, request),
+        ]);
+      })
+      .then(([req]) => {
+        const mock = this.mocks.find(
+          req,
+          (url) => this.internalUrlConverter(url),
+        );
+
+        return Promise.all([req, mock?.responseFn?.(), undefined]);
+      })
+      .then(([req, res]) => {
+        if (res !== undefined) {
+          status = FetchpStatus.SUCCESS;
+
+          return Promise.all([
+            req,
+            res,
+            undefined,
+            init?.statusCallback?.(status),
+            this.hooks.callHook(FetchpHookType.StateChange, req, status),
+          ]);
+        }
+
+        status = FetchpStatus.LOADING;
+
+        return Promise.all([
+          req,
+          this.internalFetcher(req),
+          undefined,
+          init?.statusCallback?.(status),
+          this.hooks.callHook(FetchpHookType.StateChange, req, status),
+        ]);
+      })
+      .then(([req, res]) => {
+        status = FetchpStatus.SUCCESS;
+
+        return Promise.all([
+          req,
+          res,
+          undefined,
+          init?.statusCallback?.(status),
+          this.hooks.callHook(FetchpHookType.StateChange, req, status),
+        ]);
+      })
+      .catch((err) => {
+        error = err;
+        status = FetchpStatus.ERROR;
+
+        return Promise.all([
+          undefined,
+          undefined,
+          err,
+          init?.errorCallback?.(err),
+          init?.statusCallback?.(status),
+          this.hooks.callHook(FetchpHookType.StateChange, request, status),
+          this.hooks.callHook(FetchpHookType.Error, request, err),
+        ]);
+      })
+      .finally(() => {
+        if (abortController.signal.aborted) {
+          status = FetchpStatus.CANCELED;
+
+          return Promise.all([
+            undefined,
+            undefined,
+            undefined,
+            init?.cancelCallback?.(),
+            init?.statusCallback?.(status),
+            this.hooks.callHook(FetchpHookType.StateChange, request, status),
+            this.hooks.callHook(FetchpHookType.Cancel, request),
+          ]);
+        }
+      });
+
+    response = promise.then(([, res, err]) => {
+      if (err !== undefined) {
+        return undefined;
       }
 
-      return this.internalFetcher(requestUrl, requestInit);
+      return res;
     });
 
+    const data = response.then((res) => {
+      const serialized = this.internalDataDeserializer<T>(res);
+
+      return Promise.all([
+        serialized,
+        init?.successCallback?.(serialized),
+        this.hooks.callHook(FetchpHookType.Success, request, serialized),
+      ]);
+    })
+      .then(([serialized]) => serialized);
+
     const result = {
-      requestUrl,
-      response,
+      get request() {
+        return request;
+      },
+      get response() {
+        return response;
+      },
       abortController,
 
-      data: response.then((res) => this.internalDataDeserializer<T>(res)),
+      get status() {
+        return status;
+      },
+
+      get error() {
+        return error;
+      },
+
+      get data() {
+        return data;
+      },
+
+      exec: () => {
+        awaiterResolve(undefined);
+
+        return result;
+      },
     };
+
+    if (init?.autoFetch !== false) {
+      awaiterResolve(undefined);
+    }
 
     return result;
   }
@@ -120,6 +284,10 @@ export {
   Fetchp,
   fetchp,
   fetchp as default,
+  type FetchpHookFn,
+  FetchpHookType,
   type FetchpInterface,
+  type FetchpRequestInit,
   type FetchpResultInterface,
+  FetchpStatus,
 };
