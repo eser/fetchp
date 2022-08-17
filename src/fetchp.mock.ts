@@ -10,7 +10,6 @@ import {
   type HookRegistryInterface,
   MockRegistry,
   type MockRegistryInterface,
-  type MockRegistryItem,
 } from "./fetchp";
 
 // interface definitions
@@ -58,5 +57,4 @@ export {
   type HookRegistryInterface,
   MockRegistry,
   type MockRegistryInterface,
-  type MockRegistryItem,
 };

@@ -1,14 +1,11 @@
+import { UrlCollection, type UrlCollectionInterface } from "./url-collection";
+
 // interface definitions
 // ---------------------
-interface MockRegistryItem {
-  methods: string[];
-  requestUrlPattern: string | RegExp;
-  isRegExp: boolean;
-  responseFn: (request: Request) => Response;
-}
+type MockResponseFn = (request: Request) => Response;
 
 interface MockRegistryInterface {
-  items: MockRegistryItem[];
+  items: UrlCollectionInterface<MockResponseFn>;
 
   add(
     methods: string | string[],
@@ -21,55 +18,35 @@ interface MockRegistryInterface {
     urlConverter?: (url: string) => URL,
   ): {
     request: Request;
-    responseFn: ((request: Request) => Response) | undefined;
+    responseFn: MockResponseFn | undefined;
   };
 }
 
-class MockRegistry implements MockRegistry {
-  items: MockRegistryItem[];
+class MockRegistry implements MockRegistryInterface {
+  items: UrlCollection<MockResponseFn>;
 
   constructor() {
-    this.items = <MockRegistryItem[]> [];
+    this.items = new UrlCollection<MockResponseFn>();
   }
 
   add(
     methods: string | string[],
     requestUrlPattern: string | RegExp,
-    response: Response | ((request: Request) => Response),
+    response: Response | MockResponseFn,
   ): void {
-    const methods_ = (methods.constructor === Array)
-      ? methods
-      : [<string> methods];
-    const isRegExp = (requestUrlPattern.constructor === RegExp);
     const responseFn = (response.constructor === Function)
-      ? <(request: Request) => Response> response
+      ? <MockResponseFn> response
       : (_: Request) => <Response> response;
 
-    this.items.push({
-      methods: methods_,
-      requestUrlPattern,
-      isRegExp,
-      responseFn,
-    });
+    this.items.add(methods, requestUrlPattern, responseFn);
   }
 
   find(request: Request, urlConverter?: (url: string) => URL) {
-    const foundMocks = this.items
-      .filter((x) => x.methods.includes(request.method))
-      .filter((x) => {
-        if (x.isRegExp) {
-          return (<RegExp> x.requestUrlPattern).test(request.url);
-        }
-
-        if (urlConverter !== undefined) {
-          const convertedUrl = urlConverter(<string> x.requestUrlPattern)
-            .toString();
-
-          return (convertedUrl === request.url);
-        }
-
-        return (x.requestUrlPattern === request.url);
-      });
+    const foundMocks = this.items.filter(
+      request.method,
+      request.url,
+      urlConverter,
+    );
 
     if (foundMocks.length === 0) {
       return {
@@ -80,9 +57,9 @@ class MockRegistry implements MockRegistry {
 
     return {
       request: request,
-      responseFn: foundMocks[0]?.responseFn,
+      responseFn: foundMocks[0]?.data,
     };
   }
 }
 
-export { MockRegistry, type MockRegistryInterface, type MockRegistryItem };
+export { MockRegistry, type MockRegistryInterface };

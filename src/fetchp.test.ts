@@ -75,6 +75,27 @@ describe("fetchp", () => {
     expect(hookFn).toHaveBeenCalledTimes(1);
   });
 
+  test("hooks: NewRequest with url filter", async () => {
+    const hookFn = jest.fn();
+
+    fetchp.hooks.addForUrl(
+      FetchpHookType.NewRequest,
+      "GET",
+      /^https:\/\/jsonplaceholder\.typicode\.com\//,
+      hookFn,
+    );
+
+    const response = fetchp.request(
+      "GET",
+      "https://jsonplaceholder.typicode.com/todos",
+    );
+
+    expect(await response.data).toBeDefined();
+    expect((await response.data).length).toBeGreaterThanOrEqual(10);
+    expect(response.status).toBe(FetchpStatus.SUCCESS);
+    expect(hookFn).toHaveBeenCalledTimes(1);
+  });
+
   test("disable autofetch", async () => {
     const response = fetchp.request(
       "GET",

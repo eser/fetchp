@@ -1,4 +1,4 @@
-import { type FetchpStatus, useFetchpBuilder } from "./useFetchp";
+import { type FetchpStatus, useFetchpBuilder } from "./use-fetchp";
 import { fetchp } from "./fetchp.mock";
 
 const useFetchpMock = useFetchpBuilder(fetchp);

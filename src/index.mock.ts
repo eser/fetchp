@@ -1,2 +1,2 @@
 export * from "./fetchp.mock";
-export { default, useFetchp, useFetchpBuilder } from "./useFetchp.mock";
+export { default, useFetchp, useFetchpBuilder } from "./use-fetchp.mock";

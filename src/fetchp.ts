@@ -6,11 +6,7 @@ import {
   HookRegistry,
   type HookRegistryInterface,
 } from "./hook-registry";
-import {
-  MockRegistry,
-  type MockRegistryInterface,
-  type MockRegistryItem,
-} from "./mock-registry";
+import { MockRegistry, type MockRegistryInterface } from "./mock-registry";
 
 enum FetchpStatus {
   IDLE = "idle",
@@ -130,7 +126,7 @@ class Fetchp implements FetchpInterface {
         return Promise.all([
           undefined,
           undefined,
-          this.hooks.callHook(
+          this.hooks.callGlobalHooks(
             FetchpHookType.BuildRequestHeaders,
             headers,
           ),
@@ -151,7 +147,12 @@ class Fetchp implements FetchpInterface {
           request,
           undefined,
           undefined,
-          this.hooks.callHook(FetchpHookType.NewRequest, request),
+          this.hooks.callHooksWithRequest(
+            FetchpHookType.NewRequest,
+            request,
+            this.internalUrlConverter,
+            request,
+          ),
         ]);
       })
       .then(([req]) => {
@@ -171,7 +172,13 @@ class Fetchp implements FetchpInterface {
             res,
             undefined,
             init?.statusCallback?.(status),
-            this.hooks.callHook(FetchpHookType.StateChange, req, status),
+            this.hooks.callHooksWithRequest(
+              FetchpHookType.StateChange,
+              req,
+              this.internalUrlConverter,
+              req,
+              status,
+            ),
           ]);
         }
 
@@ -181,7 +188,13 @@ class Fetchp implements FetchpInterface {
           this.internalFetcher(req),
           undefined,
           init?.statusCallback?.(status),
-          this.hooks.callHook(FetchpHookType.StateChange, req, status),
+          this.hooks.callHooksWithRequest(
+            FetchpHookType.StateChange,
+            req,
+            this.internalUrlConverter,
+            req,
+            status,
+          ),
         ]);
       })
       .then(([req, res]) => {
@@ -192,7 +205,13 @@ class Fetchp implements FetchpInterface {
           res,
           undefined,
           init?.statusCallback?.(status),
-          this.hooks.callHook(FetchpHookType.StateChange, req, status),
+          this.hooks.callHooksWithRequest(
+            FetchpHookType.StateChange,
+            req,
+            this.internalUrlConverter,
+            req,
+            status,
+          ),
         ]);
       })
       .catch((err) => {
@@ -205,8 +224,20 @@ class Fetchp implements FetchpInterface {
           err,
           init?.errorCallback?.(err),
           init?.statusCallback?.(status),
-          this.hooks.callHook(FetchpHookType.StateChange, request, status),
-          this.hooks.callHook(FetchpHookType.Error, request, err),
+          this.hooks.callHooksWithRequest(
+            FetchpHookType.StateChange,
+            request,
+            this.internalUrlConverter,
+            request,
+            status,
+          ),
+          this.hooks.callHooksWithRequest(
+            FetchpHookType.Error,
+            request,
+            this.internalUrlConverter,
+            request,
+            err,
+          ),
         ]);
       })
       .finally(() => {
@@ -219,8 +250,19 @@ class Fetchp implements FetchpInterface {
             undefined,
             init?.cancelCallback?.(),
             init?.statusCallback?.(status),
-            this.hooks.callHook(FetchpHookType.StateChange, request, status),
-            this.hooks.callHook(FetchpHookType.Cancel, request),
+            this.hooks.callHooksWithRequest(
+              FetchpHookType.StateChange,
+              request,
+              this.internalUrlConverter,
+              request,
+              status,
+            ),
+            this.hooks.callHooksWithRequest(
+              FetchpHookType.Cancel,
+              request,
+              this.internalUrlConverter,
+              request,
+            ),
           ]);
         }
       });
@@ -239,7 +281,13 @@ class Fetchp implements FetchpInterface {
       return Promise.all([
         serialized,
         init?.successCallback?.(serialized),
-        this.hooks.callHook(FetchpHookType.Success, request, serialized),
+        this.hooks.callHooksWithRequest(
+          FetchpHookType.Success,
+          request,
+          this.internalUrlConverter,
+          request,
+          serialized,
+        ),
       ]);
     })
       .then(([serialized]) => serialized);
@@ -297,5 +345,4 @@ export {
   type HookRegistryInterface,
   MockRegistry,
   type MockRegistryInterface,
-  type MockRegistryItem,
 };

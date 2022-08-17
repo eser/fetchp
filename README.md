@@ -15,7 +15,8 @@
   - [Aborting a Request](#aborting-a-request)
   - [Setting a Base URL for Requests](#setting-a-base-url-for-requests)
   - [Middlewares / Hooks](#middlewares--hooks)
-  - [On-Demand Fetch](#on-demand-fetch)
+  - [Middlewares / Hooks (URL Based)](#middlewares--hooks-url-based)
+  - [On-Demand Fetching](#on-demand-fetching)
   - [Mocking an URL for Request](#mocking-an-url-for-request)
   - [Mocking for Testing (Buggy ATM)](#mocking-for-testing-buggy-atm)
   - [Using with _**React Hooks**_](#using-with-react-hooks)
@@ -155,6 +156,28 @@ const response = fetchp.request(
 );
 ```
 
+### Middlewares / Hooks (URL Based)
+
+Assume that you're need to observe state changes only for the urls in your
+filter.
+
+```js
+import { fetchp, FetchpHookType } from "fetchp";
+
+fetchp.hooks.addForUrl(
+  FetchpHookType.StateChange,
+  ["GET", "POST"],
+  /^https:\/\/jsonplaceholder\.typicode\.com\//,
+  (request, status) =>
+    console.log(`[state change] ${request.url} -> ${status}`),
+);
+
+const response = fetchp.request(
+  "GET",
+  "https://jsonplaceholder.typicode.com/todos",
+);
+```
+
 ### On-Demand Fetching
 
 Assume that you don't want to invoke the request immediately. You'll set up an
@@ -179,16 +202,17 @@ behavior.
 import { fetchp } from "fetchp";
 
 const mockContent = { hello: "world" };
-const mockResponse = (request) => new Response(
-  JSON.stringify(mockContent),
-  {
-    status: 200,
-    statusText: "OK",
-    headers: {
-      "content-type": "application/json",
+const mockResponse = (request) =>
+  new Response(
+    JSON.stringify(mockContent),
+    {
+      status: 200,
+      statusText: "OK",
+      headers: {
+        "content-type": "application/json",
+      },
     },
-  },
-);
+  );
 
 fetchp.mocks.add(["GET", "POST"], "/hello", mockResponse);
 
