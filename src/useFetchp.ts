@@ -31,7 +31,9 @@ const useFetchpBuilder = function useFetchpBuilder(
           const result = fetchpInstance.request<T>(method, url, {
             ...(init ?? {}),
             autoFetch: true,
-            statusCallback: (newStatus) => setStatus(newStatus),
+            statusCallback: (newStatus) => {
+              setStatus(newStatus);
+            },
             errorCallback: (newError) => setError(newError),
             successCallback: (newData) => setData(newData),
             // cancelCallback: () => {},

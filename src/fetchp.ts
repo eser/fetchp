@@ -172,7 +172,6 @@ class Fetchp implements FetchpInterface {
         }
 
         status = FetchpStatus.LOADING;
-
         return Promise.all([
           req,
           this.internalFetcher(req),
@@ -230,8 +229,8 @@ class Fetchp implements FetchpInterface {
       return res;
     });
 
-    const data = response.then((res) => {
-      const serialized = this.internalDataDeserializer<T>(res);
+    const data = response.then(async (res) => {
+      const serialized = await this.internalDataDeserializer<T>(res);
 
       return Promise.all([
         serialized,
