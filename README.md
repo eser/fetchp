@@ -12,6 +12,7 @@
 - [Usage](#usage)
   - [Basic HTTP Request For Text-Based Data](#basic-http-request-for-text-based-data)
   - [Basic HTTP Request For JSON Data](#basic-http-request-for-json-data)
+  - [Caching Requests](#caching-requests)
   - [Aborting a Request](#aborting-a-request)
   - [Setting a Base URL for Requests](#setting-a-base-url-for-requests)
   - [Middlewares / Hooks](#middlewares--hooks)
@@ -37,8 +38,8 @@ and superpowers". The trailing "p" is a means for "plus".
 ### Why? What's the motivation?
 
 [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) is a
-standard Web API that's already supported by modern browsers, Deno, node.js,
-bun and etc.
+standard Web API that's already supported by modern browsers, Deno, node.js, bun
+and etc.
 
 We don't need another HTTP client. Still, a web API's target audience is very
 broad. APIs like fetch are being designed carefully by the community and
@@ -71,6 +72,7 @@ any project.
 - [x] Mocking response for requests (not just for tests)
 - [x] Setting Base URL
 - [x] Automatic deserialization/parsing by content-types
+- [x] Prefetching and local caching
 - [x] On-demand fetching
 - [x] Fetch status
 - [x] Multiple instances of fetchp
@@ -109,6 +111,26 @@ const req = fetchp.request("GET", "https://jsonplaceholder.typicode.com/posts");
 console.log(await req.data);
 ```
 
+### Caching Requests
+
+```js
+import { fetchp, FetchpStatus } from "fetchp";
+
+const doReq = () =>
+  fetchp.request(
+    "GET",
+    "https://jsonplaceholder.typicode.com/posts",
+    { cacheRequest: true },
+  );
+
+const response1 = doReq();
+await new Promise((r) => setTimeout(r, 1000));
+const response2 = doReq();
+
+// you can check equality afterwars
+assert(await response1.data === await response2.data);
+```
+
 ### Aborting a Request
 
 ```js
@@ -125,8 +147,9 @@ assert(req.status === FetchpStatus.CANCELED);
 
 ### Setting a Base URL for Requests
 
-Assume that you're working with a single API on the backend, and you don't want to
-repeat yourself by concatenating endpoint URL strings in each request you make.
+Assume that you're working with a single API on the backend, and you don't want
+to repeat yourself by concatenating endpoint URL strings in each request you
+make.
 
 ```js
 import { fetchp } from "fetchp";
@@ -319,6 +342,7 @@ console.log(await req.data);
 
 See [GitHub Projects](https://github.com/eserozvataf/fetchp/projects) for more.
 
+- [ ] Clean cache storage
 - [ ] Fixing the bug in `fetchp/mock` module
 - [ ] Add advanced support for hooks / middlewares / interceptors
 - [ ] Protobuf support

@@ -47,7 +47,7 @@ const useFetchpBuilder = function useFetchpBuilder(
         // }
 
         setError(undefined);
-        setStatus(FetchpStatus.LOADING);
+        setStatus(FetchpStatus.FETCHING);
 
         try {
           const result = fetchpInstance.request<T>(method, url, {
@@ -77,6 +77,7 @@ const useFetchpBuilder = function useFetchpBuilder(
       data,
       status,
       isIdle: (status === FetchpStatus.IDLE),
+      isFetching: (status === FetchpStatus.FETCHING),
       isLoading: (status === FetchpStatus.LOADING),
       isError: (status === FetchpStatus.ERROR),
       isCanceled: (status === FetchpStatus.CANCELED),

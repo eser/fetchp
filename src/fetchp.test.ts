@@ -2,6 +2,7 @@ import { fetchp, FetchpHookType, FetchpStatus } from "./fetchp";
 
 beforeEach(() => {
   fetchp.setBaseUrl(undefined);
+  fetchp.cache.items.clear();
 });
 
 describe("fetchp", () => {
@@ -112,6 +113,44 @@ describe("fetchp", () => {
 
     expect(await response.data).toBeDefined();
     expect(response.status).toBe(FetchpStatus.SUCCESS);
+  });
+
+  test("caching", async () => {
+    const statusFetchingFn = jest.fn();
+    const statusLoadingFn = jest.fn();
+
+    const doRequest = () =>
+      fetchp.request(
+        "GET",
+        "https://jsonplaceholder.typicode.com/todos",
+        {
+          cacheRequest: true,
+          statusCallback: (status) => {
+            if (status === FetchpStatus.FETCHING) {
+              statusFetchingFn();
+              return;
+            }
+
+            if (status === FetchpStatus.LOADING) {
+              statusLoadingFn();
+              return;
+            }
+          },
+        },
+      );
+
+    const response1 = await doRequest();
+    await new Promise((r) => setTimeout(r, 1000));
+    const response2 = await doRequest();
+
+    expect(await response1.data).toBeDefined();
+    expect(response1.status).toBe(FetchpStatus.SUCCESS);
+
+    expect(await response2.data).toBeDefined();
+    expect(response2.status).toBe(FetchpStatus.SUCCESS);
+
+    expect(statusFetchingFn).toHaveBeenCalledTimes(1);
+    expect(statusLoadingFn).toHaveBeenCalledTimes(2);
   });
 
   test("abort request", async () => {

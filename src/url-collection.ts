@@ -16,6 +16,8 @@ interface UrlCollectionInterface<T = unknown> {
     data: T,
   ): void;
 
+  clear(): void;
+
   filter(
     method: string,
     url: string,
@@ -39,7 +41,7 @@ class UrlCollection<T = unknown> implements UrlCollectionInterface<T> {
     methods: string | string[],
     requestUrlPattern: string | RegExp,
     data: T,
-  ): void {
+  ) {
     const methods_ = (methods.constructor === Array)
       ? methods
       : [<string> methods];
@@ -51,6 +53,10 @@ class UrlCollection<T = unknown> implements UrlCollectionInterface<T> {
       isRegExp,
       data,
     });
+  }
+
+  clear() {
+    this.items = <UrlCollectionItem<T>[]> [];
   }
 
   filter(method: string, url: string, urlConverter?: (url: string) => URL) {

@@ -2,7 +2,7 @@ import { UrlCollection, type UrlCollectionInterface } from "./url-collection";
 
 // interface definitions
 // ---------------------
-type MockResponseFn = (request: Request) => Response;
+type MockResponseFn = (request: Request) => Promise<Response>;
 
 interface MockRegistryInterface {
   items: UrlCollectionInterface<MockResponseFn>;
@@ -10,7 +10,7 @@ interface MockRegistryInterface {
   add(
     methods: string | string[],
     requestUrlPattern: string | RegExp,
-    response: Response | (() => Response),
+    response: Response | MockResponseFn,
   ): void;
 
   find(
@@ -36,7 +36,7 @@ class MockRegistry implements MockRegistryInterface {
   ): void {
     const responseFn = (response.constructor === Function)
       ? <MockResponseFn> response
-      : (_: Request) => <Response> response;
+      : (_: Request) => Promise.resolve(<Response> response);
 
     this.items.add(methods, requestUrlPattern, responseFn);
   }

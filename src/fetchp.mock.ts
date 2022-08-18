@@ -1,4 +1,6 @@
 import {
+  CacheRegistry,
+  type CacheRegistryInterface,
   Fetchp,
   type FetchpHookFn,
   FetchpHookType,
@@ -44,6 +46,8 @@ class FetchpMock extends Fetchp implements FetchpInterfaceMock {
 const fetchpMock = new FetchpMock();
 
 export {
+  CacheRegistry,
+  type CacheRegistryInterface,
   type FetchpHookFn,
   FetchpHookType,
   type FetchpInterface,
