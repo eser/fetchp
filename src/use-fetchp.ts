@@ -10,7 +10,7 @@ import {
 const useFetchpBuilder = function useFetchpBuilder(
   fetchpInstance: FetchpInterface,
 ) {
-  return function useFetchp<T>(
+  return function useFetchp<T = any>(
     method: string,
     url: string,
     init?: FetchpRequestInit,
