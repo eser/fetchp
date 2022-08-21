@@ -24,7 +24,7 @@ interface FetchpRequestInit extends RequestInit {
   cacheRequest?: boolean;
   statusCallback?: (status: FetchpStatus) => void;
   successCallback?: (data: any) => void;
-  errorCallback?: (error: unknown) => void;
+  errorCallback?: (error: any) => void;
   cancelCallback?: () => void;
 }
 
@@ -33,7 +33,7 @@ interface FetchpResultInterface<T = any> {
   readonly response: Promise<Response | undefined>;
   abortController: AbortController;
   readonly status: FetchpStatus;
-  readonly error: unknown | undefined;
+  readonly error: any;
   readonly data: Promise<T | undefined>;
 
   exec(): FetchpResultInterface<T>;
@@ -60,7 +60,7 @@ type InternalFetchState = [
   status: FetchpStatus,
   request: Request | undefined,
   response: Response | undefined,
-  error: unknown,
+  error: any,
   ...others: any[],
 ];
 
@@ -281,8 +281,8 @@ class Fetchp implements FetchpInterface {
 
   internalRequestOnError(
     request: Request | undefined,
-    error: unknown,
-    callback: (status: FetchpStatus, error: unknown) => void,
+    error: any,
+    callback: (status: FetchpStatus, error: any) => void,
   ): Promise<InternalFetchState> {
     return Promise.all([
       FetchpStatus.ERROR,
@@ -297,7 +297,7 @@ class Fetchp implements FetchpInterface {
     status: FetchpStatus,
     request: Request | undefined,
     response: Response | undefined,
-    error: unknown | undefined,
+    error: any,
     init: FetchpRequestInit | undefined,
     abortController: AbortController,
     callback: (status: FetchpStatus) => void,
@@ -374,10 +374,10 @@ class Fetchp implements FetchpInterface {
     status: FetchpStatus,
     request: Request | undefined,
     response: Response | undefined,
-    error: unknown | undefined,
+    error: any,
     init: FetchpRequestInit | undefined,
-    callback: (status: FetchpStatus, error: unknown) => void,
-  ): Promise<[FetchpStatus, T | undefined, unknown, ...any[]]> {
+    callback: (status: FetchpStatus, error: any) => void,
+  ): Promise<[FetchpStatus, T | undefined, any, ...any[]]> {
     if ([FetchpStatus.CANCELED, FetchpStatus.ERROR].includes(status)) {
       return Promise.all([
         status,
@@ -429,7 +429,7 @@ class Fetchp implements FetchpInterface {
     >();
 
     let status = FetchpStatus.IDLE;
-    let error: unknown | undefined;
+    let error: any;
     let request: Request | undefined;
     let response: Promise<Response | undefined>;
 
