@@ -1,18 +1,16 @@
-import { fetchp, FetchpHookType, FetchpStatus } from "./fetchp";
+import { fetchp, FetchpHookType, FetchpStatus } from "./fetchp.ts";
+import { asserts, mock } from "./deps.ts";
 
-beforeEach(() => {
-  fetchp.setBaseUrl(undefined);
-  fetchp.cache.items.clear();
-});
-
-describe("fetchp", () => {
-  test("baseUrl setter", () => {
+Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
+  await t.step("baseUrl setter", () => {
     fetchp.setBaseUrl("http://localhost/");
 
-    expect(fetchp.baseUrl).toEqual("http://localhost/");
+    asserts.assertEquals(fetchp.baseUrl, "http://localhost/");
+
+    fetchp.setBaseUrl(undefined);
   });
 
-  test("baseUrl transformer", async () => {
+  await t.step("baseUrl transformer", async () => {
     fetchp.setBaseUrl("https://jsonplaceholder.typicode.com");
 
     const res1 = fetchp.request("GET", "/posts");
@@ -20,13 +18,20 @@ describe("fetchp", () => {
 
     await Promise.all([res1.data, res2.data]);
 
-    expect(res1.request!.url.toString()).toEqual(
+    // asserts.assertExists(await res1.data);
+    // asserts.assertExists(await res2.data);
+
+    asserts.assertEquals(
+      res1.request?.url.toString(),
       "https://jsonplaceholder.typicode.com/posts",
     );
-    expect(res2.request!.url.toString()).toEqual("http://www.google.com/");
+    asserts.assertEquals(
+      res2.request?.url.toString(),
+      "http://www.google.com/",
+    );
   });
 
-  test("mocks: basic", async () => {
+  await t.step("mocks: basic", async () => {
     const mockContent = { hello: "world" };
     const mockResponse = new Response(
       JSON.stringify(mockContent),
@@ -43,47 +48,53 @@ describe("fetchp", () => {
 
     const response = fetchp.request("GET", "http://localhost/test");
 
-    expect(await response.data).toEqual(mockContent);
+    asserts.assertEquals(await response.data, mockContent);
+
+    fetchp.mocks.clear();
   });
 
-  test("hooks: BuildRequestHeaders", async () => {
-    const hookFn = jest.fn();
+  await t.step("hooks: BuildRequestHeaders", async () => {
+    const hookSpyFn = mock.spy();
 
-    fetchp.hooks.add(FetchpHookType.BuildRequestHeaders, hookFn);
+    fetchp.hooks.add(FetchpHookType.BuildRequestHeaders, hookSpyFn);
 
     const response = fetchp.request(
       "GET",
       "https://jsonplaceholder.typicode.com/todos",
     );
 
-    expect(await response.data).toBeDefined();
-    expect(hookFn).toHaveBeenCalledTimes(1);
+    asserts.assertExists(await response.data);
+    mock.assertSpyCalls(hookSpyFn, 1);
+
+    fetchp.hooks.clear();
   });
 
-  test("hooks: NewRequest", async () => {
-    const hookFn = jest.fn();
+  await t.step("hooks: NewRequest", async () => {
+    const hookSpyFn = mock.spy();
 
-    fetchp.hooks.add(FetchpHookType.NewRequest, hookFn);
+    fetchp.hooks.add(FetchpHookType.NewRequest, hookSpyFn);
 
     const response = fetchp.request(
       "GET",
       "https://jsonplaceholder.typicode.com/todos",
     );
 
-    expect(await response.data).toBeDefined();
-    expect((await response.data).length).toBeGreaterThanOrEqual(10);
-    expect(response.status).toBe(FetchpStatus.SUCCESS);
-    expect(hookFn).toHaveBeenCalledTimes(1);
+    asserts.assertExists(await response.data);
+    asserts.assert((await response.data).length >= 10);
+    asserts.assertStrictEquals(response.status, FetchpStatus.SUCCESS);
+    mock.assertSpyCalls(hookSpyFn, 1);
+
+    fetchp.hooks.clear();
   });
 
-  test("hooks: NewRequest with url filter", async () => {
-    const hookFn = jest.fn();
+  await t.step("hooks: NewRequest with url filter", async () => {
+    const hookSpyFn = mock.spy();
 
     fetchp.hooks.addForUrl(
       FetchpHookType.NewRequest,
       "GET",
       /^https:\/\/jsonplaceholder\.typicode\.com\//,
-      hookFn,
+      hookSpyFn,
     );
 
     const response = fetchp.request(
@@ -91,13 +102,15 @@ describe("fetchp", () => {
       "https://jsonplaceholder.typicode.com/todos",
     );
 
-    expect(await response.data).toBeDefined();
-    expect((await response.data).length).toBeGreaterThanOrEqual(10);
-    expect(response.status).toBe(FetchpStatus.SUCCESS);
-    expect(hookFn).toHaveBeenCalledTimes(1);
+    asserts.assertExists(await response.data);
+    asserts.assert((await response.data).length >= 10);
+    asserts.assertStrictEquals(response.status, FetchpStatus.SUCCESS);
+    mock.assertSpyCalls(hookSpyFn, 1);
+
+    fetchp.hooks.clear();
   });
 
-  test("disable autofetch", async () => {
+  await t.step("disable autofetch", async () => {
     const response = fetchp.request(
       "GET",
       "https://jsonplaceholder.typicode.com/todos",
@@ -106,18 +119,19 @@ describe("fetchp", () => {
       },
     );
 
-    // expect(await response.data).toBeUndefined();
-    expect(response.status).toBe(FetchpStatus.IDLE);
+    // asserts.assertEquals(await response.data, undefined);
+    asserts.assertStrictEquals(response.status, FetchpStatus.IDLE);
 
     setTimeout(() => response.exec(), 500);
 
-    expect(await response.data).toBeDefined();
-    expect(response.status).toBe(FetchpStatus.SUCCESS);
+    asserts.assertExists(await response.data);
+    asserts.assert((await response.data).length >= 10);
+    asserts.assertStrictEquals(response.status, FetchpStatus.SUCCESS);
   });
 
-  test("caching", async () => {
-    const statusFetchingFn = jest.fn();
-    const statusLoadingFn = jest.fn();
+  await t.step("caching", async () => {
+    const statusFetchingSpyFn = mock.spy();
+    const statusLoadingSpyFn = mock.spy();
 
     const doRequest = () =>
       fetchp.request(
@@ -127,12 +141,12 @@ describe("fetchp", () => {
           cacheRequest: true,
           statusCallback: (status) => {
             if (status === FetchpStatus.FETCHING) {
-              statusFetchingFn();
+              statusFetchingSpyFn();
               return;
             }
 
             if (status === FetchpStatus.LOADING) {
-              statusLoadingFn();
+              statusLoadingSpyFn();
               return;
             }
           },
@@ -143,17 +157,21 @@ describe("fetchp", () => {
     await new Promise((r) => setTimeout(r, 1000));
     const response2 = await doRequest();
 
-    expect(await response1.data).toBeDefined();
-    expect(response1.status).toBe(FetchpStatus.SUCCESS);
+    asserts.assertExists(await response1.data);
+    asserts.assert((await response1.data).length >= 10);
+    asserts.assertStrictEquals(response1.status, FetchpStatus.SUCCESS);
 
-    expect(await response2.data).toBeDefined();
-    expect(response2.status).toBe(FetchpStatus.SUCCESS);
+    asserts.assertExists(await response2.data);
+    asserts.assert((await response2.data).length >= 10);
+    asserts.assertStrictEquals(response2.status, FetchpStatus.SUCCESS);
 
-    expect(statusFetchingFn).toHaveBeenCalledTimes(1);
-    expect(statusLoadingFn).toHaveBeenCalledTimes(2);
+    mock.assertSpyCalls(statusFetchingSpyFn, 1);
+    mock.assertSpyCalls(statusLoadingSpyFn, 2);
+
+    fetchp.cache.clear();
   });
 
-  test("abort request", async () => {
+  await t.step("abort request", async () => {
     const response = fetchp.request(
       "GET",
       "https://jsonplaceholder.typicode.com/todos",
@@ -161,18 +179,18 @@ describe("fetchp", () => {
 
     response.abortController.abort();
 
-    expect(await response.data).toBeUndefined();
-    expect(response.status).toBe(FetchpStatus.CANCELED);
+    asserts.assertEquals(await response.data, undefined);
+    asserts.assertStrictEquals(response.status, FetchpStatus.CANCELED);
   });
 
-  test("invalid url", async () => {
+  await t.step("invalid url", async () => {
     const response = fetchp.request(
       "GET",
       "impossiblescenario://invalid",
     );
 
-    expect(await response.data).toBeUndefined();
-    expect(response.status).toBe(FetchpStatus.ERROR);
-    expect(response.error).toBeDefined();
+    asserts.assertEquals(await response.data, undefined);
+    asserts.assertStrictEquals(response.status, FetchpStatus.ERROR);
+    asserts.assertExists(response.error);
   });
 });

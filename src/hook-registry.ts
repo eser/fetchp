@@ -1,4 +1,7 @@
-import { UrlCollection, type UrlCollectionInterface } from "./url-collection";
+import {
+  UrlCollection,
+  type UrlCollectionInterface,
+} from "./url-collection.ts";
 
 // interface definitions
 // ---------------------
@@ -11,6 +14,7 @@ enum FetchpHookType {
   Cancel = "Cancel",
 }
 
+// deno-lint-ignore no-explicit-any
 type FetchpHookFn = (...params: any[]) => void;
 
 interface FetchpHookItem {
@@ -28,15 +32,18 @@ interface HookRegistryInterface {
     requestUrlPattern: string | RegExp,
     func: FetchpHookFn,
   ): void;
+  clear(): void;
 
   callGlobalHooks(
     hookType: FetchpHookType,
+    // deno-lint-ignore no-explicit-any
     ...params: any[]
   ): Promise<undefined>;
   callHooksWithRequest(
     hookType: FetchpHookType,
     request: Request | undefined,
     urlConverter: ((url: string) => URL) | undefined,
+    // deno-lint-ignore no-explicit-any
     ...params: any[]
   ): Promise<undefined>;
 }
@@ -72,6 +79,11 @@ class HookRegistry implements HookRegistryInterface {
     this.items[hookType].urlBased.add(methods, requestUrlPattern, func);
   }
 
+  clear(): void {
+    this.items = <Record<FetchpHookType, FetchpHookItem>> {};
+  }
+
+  // deno-lint-ignore no-explicit-any
   async callGlobalHooks(hookType: FetchpHookType, ...params: any[]) {
     if (!(hookType in this.items)) {
       return;
@@ -88,6 +100,7 @@ class HookRegistry implements HookRegistryInterface {
     hookType: FetchpHookType,
     request: Request | undefined,
     urlConverter: ((url: string) => URL) | undefined,
+    // deno-lint-ignore no-explicit-any
     ...params: any[]
   ) {
     if (!(hookType in this.items)) {

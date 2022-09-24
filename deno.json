@@ -1,0 +1,58 @@
+{
+  "importMap": "./import_map.json",
+  "lint": {
+    "files": {
+      "include": [
+        "src/",
+        "mod.ts",
+        "*.md",
+        "*.json"
+      ],
+      "exclude": [
+        "dist/",
+        "node_modules/"
+      ]
+    },
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [],
+      "exclude": []
+    }
+  },
+  "fmt": {
+    "files": {
+      "include": [
+        "src/",
+        "mod.ts",
+        "*.md",
+        "*.json"
+      ],
+      "exclude": [
+        "dist/",
+        "node_modules/"
+      ]
+    }
+  },
+  "test": {
+    "files": {
+      "include": [
+        "src/"
+      ],
+      "exclude": [
+        "dist/",
+        "node_modules/"
+      ]
+    }
+  },
+  "tasks": {
+    "test": "deno test ./src/ --allow-net --coverage=./etc/coverage",
+    "test:coverage": "deno coverage ./etc/coverage",
+    "test:generate-lcov": "deno coverage ./etc/coverage --lcov > ./etc/coverage/cov_profile.lcov",
+    "bench": "deno bench ./src/ --unstable",
+    "cleanup": "rm -rf ./dist/ yarn.lock package-lock.json",
+    "build": "deno run -A packager.ts",
+    "pub": "deno task build && npm publish dist/"
+  }
+}

@@ -5,9 +5,12 @@ import {
   FetchpHookType,
   HookRegistry,
   type HookRegistryInterface,
-} from "./hook-registry";
-import { MockRegistry, type MockRegistryInterface } from "./mock-registry";
-import { CacheRegistry, type CacheRegistryInterface } from "./cache-registry";
+} from "./hook-registry.ts";
+import { MockRegistry, type MockRegistryInterface } from "./mock-registry.ts";
+import {
+  CacheRegistry,
+  type CacheRegistryInterface,
+} from "./cache-registry.ts";
 
 enum FetchpStatus {
   IDLE = "idle",
@@ -23,16 +26,20 @@ interface FetchpRequestInit extends RequestInit {
   autoFetch?: boolean;
   cacheRequest?: boolean;
   statusCallback?: (status: FetchpStatus) => void;
+  // deno-lint-ignore no-explicit-any
   successCallback?: (data: any) => void;
+  // deno-lint-ignore no-explicit-any
   errorCallback?: (error: any) => void;
   cancelCallback?: () => void;
 }
 
+// deno-lint-ignore no-explicit-any
 interface FetchpResultInterface<T = any> {
   readonly request: Request | undefined;
   readonly response: Promise<Response | undefined>;
   abortController: AbortController;
   readonly status: FetchpStatus;
+  // deno-lint-ignore no-explicit-any
   readonly error: any;
   readonly data: Promise<T | undefined>;
 
@@ -47,6 +54,7 @@ interface FetchpInterface {
 
   setBaseUrl: (url: string) => void;
 
+  // deno-lint-ignore no-explicit-any
   request: <T = any>(
     method: string,
     url: string,
@@ -60,7 +68,9 @@ type InternalFetchState = [
   status: FetchpStatus,
   request: Request | undefined,
   response: Response | undefined,
+  // deno-lint-ignore no-explicit-any
   error: any,
+  // deno-lint-ignore no-explicit-any
   ...others: any[],
 ];
 
@@ -105,7 +115,7 @@ class Fetchp implements FetchpInterface {
 
   internalDataDeserializer<T>(
     response: Response,
-    cacheMode: boolean = false,
+    cacheMode: boolean,
   ): Promise<T> {
     const contentType = response.headers?.get("content-type");
 
@@ -193,8 +203,7 @@ class Fetchp implements FetchpInterface {
   internalRequestStep3CheckForMocks(
     request: Request | undefined,
     abortController: AbortController,
-    // @ts-ignore
-    callback: (status: FetchpStatus) => void,
+    _callback: (status: FetchpStatus) => void,
   ): Promise<InternalFetchState> {
     const mockedResponse =
       (request !== undefined && !abortController.signal.aborted)
@@ -214,8 +223,7 @@ class Fetchp implements FetchpInterface {
     request: Request | undefined,
     mockedResponse: Response | undefined,
     abortController: AbortController,
-    // @ts-ignore
-    callback: (status: FetchpStatus) => void,
+    _callback: (status: FetchpStatus) => void,
   ): Promise<InternalFetchState> {
     const mockedOrCachedResponse =
       (request === undefined || abortController.signal.aborted ||
@@ -281,7 +289,9 @@ class Fetchp implements FetchpInterface {
 
   internalRequestOnError(
     request: Request | undefined,
+    // deno-lint-ignore no-explicit-any
     error: any,
+    // deno-lint-ignore no-explicit-any
     callback: (status: FetchpStatus, error: any) => void,
   ): Promise<InternalFetchState> {
     return Promise.all([
@@ -297,6 +307,7 @@ class Fetchp implements FetchpInterface {
     status: FetchpStatus,
     request: Request | undefined,
     response: Response | undefined,
+    // deno-lint-ignore no-explicit-any
     error: any,
     init: FetchpRequestInit | undefined,
     abortController: AbortController,
@@ -370,13 +381,17 @@ class Fetchp implements FetchpInterface {
     ]);
   }
 
+  // deno-lint-ignore no-explicit-any
   async internalLoadStep2Deserialization<T = any>(
     status: FetchpStatus,
     request: Request | undefined,
     response: Response | undefined,
+    // deno-lint-ignore no-explicit-any
     error: any,
     init: FetchpRequestInit | undefined,
+    // deno-lint-ignore no-explicit-any
     callback: (status: FetchpStatus, error: any) => void,
+    // deno-lint-ignore no-explicit-any
   ): Promise<[FetchpStatus, T | undefined, any, ...any[]]> {
     if ([FetchpStatus.CANCELED, FetchpStatus.ERROR].includes(status)) {
       return Promise.all([
@@ -388,7 +403,7 @@ class Fetchp implements FetchpInterface {
     }
 
     const deserialized = (response !== undefined)
-      ? this.internalDataDeserializer<T>(response, init?.cacheRequest)
+      ? this.internalDataDeserializer<T>(response, init?.cacheRequest ?? false)
       : undefined;
 
     return Promise.all([
@@ -415,6 +430,7 @@ class Fetchp implements FetchpInterface {
     ]);
   }
 
+  // deno-lint-ignore no-explicit-any
   request<T = any>(method: string, url: string, init?: FetchpRequestInit) {
     const url_ = this.internalUrlConverter(url);
 
@@ -429,9 +445,9 @@ class Fetchp implements FetchpInterface {
     >();
 
     let status = FetchpStatus.IDLE;
+    // deno-lint-ignore no-explicit-any
     let error: any;
     let request: Request | undefined;
-    let response: Promise<Response | undefined>;
 
     // -- REQUEST PART -- //
     const promise = awaiter
@@ -486,7 +502,9 @@ class Fetchp implements FetchpInterface {
         })
       );
 
-    response = promise.then(([, , res]) => res);
+    const response: Promise<Response | undefined> = promise.then(([, , res]) =>
+      res
+    );
 
     // -- LOAD PART -- //
     const data = promise.then(([state, req, res, err]) =>

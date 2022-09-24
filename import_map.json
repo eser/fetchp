@@ -1,0 +1,6 @@
+{
+  "imports": {
+     "react": "https://jspm.dev/react@18.2.0",
+     "react-dom": "https://jspm.dev/react-dom@18.2.0"
+  }
+}

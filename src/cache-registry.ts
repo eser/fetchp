@@ -1,4 +1,7 @@
-import { UrlCollection, type UrlCollectionInterface } from "./url-collection";
+import {
+  UrlCollection,
+  type UrlCollectionInterface,
+} from "./url-collection.ts";
 
 // interface definitions
 // ---------------------
@@ -6,6 +9,7 @@ type CacheItem = Promise<Response>;
 
 interface CacheRegistryInterface {
   items: UrlCollectionInterface<CacheItem>;
+  clear(): void;
 }
 
 class CacheRegistry implements CacheRegistryInterface {
@@ -13,6 +17,10 @@ class CacheRegistry implements CacheRegistryInterface {
 
   constructor() {
     this.items = new UrlCollection<CacheItem>();
+  }
+
+  clear(): void {
+    this.items.clear();
   }
 }
 

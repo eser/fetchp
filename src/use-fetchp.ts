@@ -5,11 +5,12 @@ import {
   type FetchpRequestInit,
   type FetchpResultInterface,
   FetchpStatus,
-} from "./fetchp";
+} from "./fetchp.ts";
 
 const useFetchpBuilder = function useFetchpBuilder(
   fetchpInstance: FetchpInterface,
 ) {
+  // deno-lint-ignore no-explicit-any
   return function useFetchp<T = any>(
     method: string,
     url: string,
@@ -17,6 +18,7 @@ const useFetchpBuilder = function useFetchpBuilder(
   ) {
     const [data, setData] = useState<T>();
     const [status, setStatus] = useState<FetchpStatus>(FetchpStatus.IDLE);
+    // deno-lint-ignore no-explicit-any
     const [error, setError] = useState<any>();
     const [result, setResult] = useState<FetchpResultInterface>();
     const [doFetch, setDoFetch] = useState(init?.autoFetch ?? true);

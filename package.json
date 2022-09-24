@@ -18,7 +18,7 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.34",
+  "version": "0.0.35",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
@@ -36,54 +36,10 @@
     "url": "https://github.com/eserozvataf/fetchp/issues"
   },
   "license": "Apache-2.0",
-  "type": "commonjs",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/mod.js",
-  "types": "./dist/esm/mod.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/mod.js",
-      "types": "./dist/esm/mod.d.ts"
-    },
-    "./mock": {
-      "require": "./dist/cjs/index.mock.js",
-      "import": "./dist/esm/mod.mock.js",
-      "types": "./dist/esm/mod.mock.d.ts"
+    "./package.json": {
+      "import": "./esm/package.json",
+      "require": "./script/package.json"
     }
-  },
-  "files": [
-    "./dist/*",
-    "LICENSE",
-    "*.md"
-  ],
-  "scripts": {
-    "start": "npm run build",
-    "build": "npm run cleanup:pre && npm run build:tsc && npm run build:rollup",
-    "build:tsc": "tsc --build",
-    "build:rollup": "rollup -c",
-    "test": "jest",
-    "pub": "npm run build && npm publish",
-    "cleanup:pre": "rm -rf ./dist/"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^22.0.2",
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "@types/jest": "^28.1.6",
-    "@types/react": "^18.0.17",
-    "jest": "^28.1.3",
-    "react": "^18.2.0",
-    "rollup": "^2.78.0",
-    "rollup-plugin-esbuild": "^4.9.2",
-    "rollup-plugin-flat-dts": "^1.6.1",
-    "rollup-plugin-multi-input": "^1.3.1",
-    "rollup-plugin-rename-files": "^2.0.0",
-    "rollup-plugin-sourcemaps": "^0.6.3",
-    "ts-jest": "^28.0.7",
-    "tslib": "^2.4.0",
-    "typescript": "^4.7.4"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0"
   }
 }

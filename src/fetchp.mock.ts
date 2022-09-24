@@ -12,7 +12,7 @@ import {
   type HookRegistryInterface,
   MockRegistry,
   type MockRegistryInterface,
-} from "./fetchp";
+} from "./fetchp.ts";
 
 // interface definitions
 // ---------------------

@@ -1,4 +1,7 @@
-import { UrlCollection, type UrlCollectionInterface } from "./url-collection";
+import {
+  UrlCollection,
+  type UrlCollectionInterface,
+} from "./url-collection.ts";
 
 // interface definitions
 // ---------------------
@@ -12,6 +15,7 @@ interface MockRegistryInterface {
     requestUrlPattern: string | RegExp,
     response: Response | MockResponseFn,
   ): void;
+  clear(): void;
 
   find(
     request: Request,
@@ -39,6 +43,10 @@ class MockRegistry implements MockRegistryInterface {
       : (_: Request) => Promise.resolve(<Response> response);
 
     this.items.add(methods, requestUrlPattern, responseFn);
+  }
+
+  clear(): void {
+    this.items.clear();
   }
 
   find(request: Request, urlConverter?: (url: string) => URL) {
