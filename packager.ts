@@ -69,4 +69,5 @@ await build({
 Deno.copyFileSync("LICENSE", "dist/LICENSE");
 Deno.copyFileSync("README.md", "dist/README.md");
 Deno.copyFileSync("CODE_OF_CONDUCT.md", "dist/CODE_OF_CONDUCT.md");
+Deno.copyFileSync("CONTRIBUTING.md", "dist/CONTRIBUTING.md");
 Deno.copyFileSync("SECURITY.md", "dist/SECURITY.md");
