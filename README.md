@@ -1,4 +1,4 @@
-# 💬 [fetchp/fetch+](https://github.com/eserozvataf/fetchp)
+[![fetchp][logo-image]](https://github.com/eserozvataf/fetchp)
 
 [![npm version][npm-image]][npm-url]
 [![npm download][npm-download-image]][npm-url]
@@ -209,7 +209,7 @@ external trigger for this.
 ```js
 import { fetchp } from "fetchp";
 
-const req = fetchp.request("GET", "/posts", { autoFetch: false });
+const req = fetchp.request("GET", "/posts", { immediate: false });
 
 setTimeout(() => req.exec(), 500);
 
@@ -354,6 +354,7 @@ See [GitHub Projects](https://github.com/eserozvataf/fetchp/projects) for more.
 ## Requirements
 
 - node.js (https://nodejs.org/)
+- Deno (to run tests and contribution) (https://deno.land/)
 
 ## License
 
@@ -380,3 +381,4 @@ modules are welcome.
 [npm-url]: https://www.npmjs.com/package/fetchp
 [license-image]: https://img.shields.io/npm/l/fetchp.svg?style=flat-square
 [license-url]: https://github.com/eserozvataf/fetchp/blob/master/LICENSE
+[logo-image]: https://raw.githubusercontent.com/eserozvataf/fetchp/master/etc/fetchp.svg

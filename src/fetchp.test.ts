@@ -110,12 +110,12 @@ Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
     fetchp.hooks.clear();
   });
 
-  await t.step("disable autofetch", async () => {
+  await t.step("disable immediate", async () => {
     const response = fetchp.request(
       "GET",
       "https://jsonplaceholder.typicode.com/todos",
       {
-        autoFetch: false,
+        immediate: false,
       },
     );
 
