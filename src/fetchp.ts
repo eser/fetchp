@@ -23,7 +23,7 @@ enum FetchpStatus {
 }
 
 interface FetchpRequestInit extends RequestInit {
-  autoFetch?: boolean;
+  immediate?: boolean;
   cacheRequest?: boolean;
   statusCallback?: (status: FetchpStatus) => void;
   // deno-lint-ignore no-explicit-any
@@ -559,7 +559,7 @@ class Fetchp implements FetchpInterface {
       },
     };
 
-    if (init?.autoFetch !== false) {
+    if (init?.immediate !== false) {
       awaiterResolve(undefined);
     }
 

@@ -20,6 +20,15 @@
   ],
   "version": "0.0.35",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
+  "scripts": {
+    "test": "deno test ./src/ --allow-net --coverage=./etc/coverage",
+    "test:coverage": "deno coverage ./etc/coverage",
+    "test:generate-lcov": "deno coverage ./etc/coverage --lcov > ./etc/coverage/cov_profile.lcov",
+    "bench": "deno bench ./src/ --unstable",
+    "cleanup": "rm -rf ./dist/ yarn.lock package-lock.json",
+    "build": "deno run -A packager.ts",
+    "pub": "deno task build && npm publish dist/"
+  },
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
     {

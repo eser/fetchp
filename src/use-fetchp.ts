@@ -21,7 +21,7 @@ const useFetchpBuilder = function useFetchpBuilder(
     // deno-lint-ignore no-explicit-any
     const [error, setError] = useState<any>();
     const [result, setResult] = useState<FetchpResultInterface>();
-    const [doFetch, setDoFetch] = useState(init?.autoFetch ?? true);
+    const [doFetch, setDoFetch] = useState(init?.immediate ?? true);
 
     useEffect(() => {
       if (!doFetch) {
@@ -32,7 +32,7 @@ const useFetchpBuilder = function useFetchpBuilder(
         // try {
         //   const result = fetchpInstance.request<T>(method, url, {
         //     ...(init ?? {}),
-        //     autoFetch: true,
+        //     immediate: true,
         //     statusCallback: (newStatus) => {
         //       setStatus(newStatus);
         //     },
@@ -54,7 +54,7 @@ const useFetchpBuilder = function useFetchpBuilder(
         try {
           const result = fetchpInstance.request<T>(method, url, {
             ...(init ?? {}),
-            autoFetch: true,
+            immediate: true,
           });
 
           setResult(result);
