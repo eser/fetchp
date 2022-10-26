@@ -42,11 +42,6 @@ await build({
       version: "18.2.0",
       peerDependency: true,
     },
-    "https://esm.sh/react-dom@18.2.0?target=deno": {
-      name: "react-dom",
-      version: "18.2.0",
-      peerDependency: true,
-    },
   },
   typeCheck: true,
   test: false,

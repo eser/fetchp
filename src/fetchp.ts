@@ -382,7 +382,7 @@ class Fetchp implements FetchpInterface {
   }
 
   // deno-lint-ignore no-explicit-any
-  async internalLoadStep2Deserialization<T = any>(
+  internalLoadStep2Deserialization<T = any>(
     status: FetchpStatus,
     request: Request | undefined,
     response: Response | undefined,
