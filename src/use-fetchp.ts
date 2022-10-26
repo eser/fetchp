@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { React } from "./deps.ts";
 import {
   fetchp,
   type FetchpInterface,
@@ -16,14 +16,14 @@ const useFetchpBuilder = function useFetchpBuilder(
     url: string,
     init?: FetchpRequestInit,
   ) {
-    const [data, setData] = useState<T>();
-    const [status, setStatus] = useState<FetchpStatus>(FetchpStatus.IDLE);
+    const [data, setData] = React.useState<T>();
+    const [status, setStatus] = React.useState<FetchpStatus>(FetchpStatus.IDLE);
     // deno-lint-ignore no-explicit-any
-    const [error, setError] = useState<any>();
-    const [result, setResult] = useState<FetchpResultInterface>();
-    const [doFetch, setDoFetch] = useState(init?.immediate ?? true);
+    const [error, setError] = React.useState<any>();
+    const [result, setResult] = React.useState<FetchpResultInterface>();
+    const [doFetch, setDoFetch] = React.useState(init?.immediate ?? true);
 
-    useEffect(() => {
+    React.useEffect(() => {
       if (!doFetch) {
         return;
       }

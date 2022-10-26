@@ -18,7 +18,7 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.35",
+  "version": "0.0.36",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "scripts": {
     "test": "deno test ./src/ --allow-net --coverage=./etc/coverage",
@@ -50,5 +50,9 @@
       "import": "./esm/package.json",
       "require": "./script/package.json"
     }
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.23",
+    "@types/react-dom": "^18.0.7"
   }
 }

@@ -37,16 +37,16 @@ await build({
     webSocket: false,
   },
   mappings: {
-    // "react": {
-    //   name: "react",
-    //   version: "18.2.0",
-    //   peerDependency: true,
-    // },
-    // "react-dom": {
-    //   name: "react-dom",
-    //   version: "18.2.0",
-    //   peerDependency: true,
-    // },
+    "https://esm.sh/react@18.2.0?target=deno": {
+      name: "react",
+      version: "18.2.0",
+      peerDependency: true,
+    },
+    "https://esm.sh/react-dom@18.2.0?target=deno": {
+      name: "react-dom",
+      version: "18.2.0",
+      peerDependency: true,
+    },
   },
   typeCheck: true,
   test: false,
