@@ -1,5 +1,5 @@
 import { fetchp, FetchpHookType, FetchpStatus } from "./fetchp.ts";
-import { asserts, mock } from "./deps.ts";
+import { asserts, mock } from "./deps-external.ts";
 
 Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
   await t.step("baseUrl setter", () => {

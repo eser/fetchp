@@ -1,4 +1,4 @@
-import { React } from "./deps.ts";
+import { React } from "./deps-external.ts";
 import {
   fetchp,
   type FetchpInterface,
