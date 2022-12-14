@@ -1,7 +1,8 @@
 import {
+  type FetchpURI,
   UrlCollection,
   type UrlCollectionInterface,
-} from "./url-collection.ts";
+} from "./uris.ts";
 
 // interface definitions
 // ---------------------
@@ -12,14 +13,14 @@ interface MockRegistryInterface {
 
   add(
     methods: string | string[],
-    requestUrlPattern: string | RegExp,
+    requestUrlPattern: string | RegExp | URLPattern,
     response: Response | MockResponseFn,
   ): void;
   clear(): void;
 
   find(
     request: Request,
-    urlConverter?: (url: string) => URL,
+    urlConverter?: (uri: FetchpURI) => URL,
   ): {
     request: Request;
     responseFn: MockResponseFn | undefined;
@@ -35,10 +36,10 @@ class MockRegistry implements MockRegistryInterface {
 
   add(
     methods: string | string[],
-    requestUrlPattern: string | RegExp,
+    requestUrlPattern: string | RegExp | URLPattern,
     response: Response | MockResponseFn,
   ): void {
-    const responseFn = (response.constructor === Function)
+    const responseFn = response.constructor === Function
       ? <MockResponseFn> response
       : (_: Request) => Promise.resolve(<Response> response);
 
@@ -49,7 +50,7 @@ class MockRegistry implements MockRegistryInterface {
     this.items.clear();
   }
 
-  find(request: Request, urlConverter?: (url: string) => URL) {
+  find(request: Request, urlConverter?: (uri: FetchpURI) => URL) {
     const foundMocks = this.items.filter(
       request.method,
       request.url,

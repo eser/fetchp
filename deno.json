@@ -47,7 +47,7 @@
     }
   },
   "tasks": {
-    "test": "deno test ./src/ --allow-net --coverage=./etc/coverage",
+    "test": "deno test ./src/ --allow-net --allow-env --coverage=./etc/coverage --parallel",
     "test:coverage": "deno coverage ./etc/coverage",
     "test:generate-lcov": "deno coverage ./etc/coverage --lcov > ./etc/coverage/cov_profile.lcov",
     "bench": "deno bench ./src/ --unstable",

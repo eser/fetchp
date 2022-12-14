@@ -1,4 +1,4 @@
-import { build, emptyDir } from "https://deno.land/x/dnt/mod.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.32.0/mod.ts";
 import packageJson from "./package.json" assert { type: "json" };
 import denoJson from "./deno.json" assert { type: "json" };
 
@@ -35,14 +35,20 @@ await build({
     weakRef: false,
     // shims WebSocket
     webSocket: false,
+    custom: [
+      {
+        module: "./src/shims/urlpattern/url-pattern.ts",
+        globalNames: ["URLPattern"],
+      },
+    ],
   },
-  mappings: {
-    "https://esm.sh/react@18.2.0?target=deno": {
-      name: "react",
-      version: "18.2.0",
-      peerDependency: true,
-    },
-  },
+  // mappings: {
+  //   "https://esm.sh/react@18.2.0?target=deno": {
+  //     name: "react",
+  //     version: "18.2.0",
+  //     peerDependency: true,
+  //   },
+  // },
   typeCheck: true,
   test: false,
   declaration: true,

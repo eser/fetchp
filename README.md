@@ -154,7 +154,7 @@ make.
 ```js
 import { fetchp } from "fetchp";
 
-fetchp.setBaseUrl("https://jsonplaceholder.typicode.com");
+fetchp.setBaseUri("https://jsonplaceholder.typicode.com");
 
 const req = fetchp.request("GET", "/posts");
 
@@ -331,7 +331,7 @@ function MyComponent(props) {
 ### Using with _**Deno**_
 
 ```js
-import { fetchp } from "https://esm.sh/fetchp";
+import { fetchp } from "npm:fetchp";
 
 const req = fetchp.request("GET", "https://www.google.com/");
 

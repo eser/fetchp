@@ -1,7 +1,4 @@
-import {
-  UrlCollection,
-  type UrlCollectionInterface,
-} from "./url-collection.ts";
+import { UrlCollection, type UrlCollectionInterface } from "./uris.ts";
 
 // interface definitions
 // ---------------------

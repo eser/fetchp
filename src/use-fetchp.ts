@@ -1,4 +1,5 @@
 import { React } from "./deps-external.ts";
+import { type FetchpURI } from "./uris.ts";
 import {
   fetchp,
   type FetchpInterface,
@@ -13,7 +14,7 @@ const useFetchpBuilder = function useFetchpBuilder(
   // deno-lint-ignore no-explicit-any
   return function useFetchp<T = any>(
     method: string,
-    url: string,
+    uri: FetchpURI,
     init?: FetchpRequestInit,
   ) {
     const [data, setData] = React.useState<T>();
@@ -21,16 +22,23 @@ const useFetchpBuilder = function useFetchpBuilder(
     // deno-lint-ignore no-explicit-any
     const [error, setError] = React.useState<any>();
     const [result, setResult] = React.useState<FetchpResultInterface>();
-    const [doFetch, setDoFetch] = React.useState(init?.immediate ?? true);
+    const [doFetch, setDoFetch] = React.useState<
+      [
+        FetchpRequestInit | undefined,
+        (value: unknown) => void,
+        // deno-lint-ignore no-explicit-any
+        (reason?: any) => void,
+      ] | undefined
+    >(undefined);
 
     React.useEffect(() => {
-      if (!doFetch) {
+      if (doFetch === undefined) {
         return;
       }
 
       const fetchData = async function fetchData() {
         // try {
-        //   const result = fetchpInstance.request<T>(method, url, {
+        //   const result = fetchpInstance.request<T>(method, uri, {
         //     ...(init ?? {}),
         //     immediate: true,
         //     statusCallback: (newStatus) => {
@@ -52,13 +60,19 @@ const useFetchpBuilder = function useFetchpBuilder(
         setStatus(FetchpStatus.FETCHING);
 
         try {
-          const result = fetchpInstance.request<T>(method, url, {
+          const finalInit = {
             ...(init ?? {}),
+            ...(doFetch[0] ?? {}),
             immediate: true,
-          });
+          };
+          const result = fetchpInstance.request<T>(method, uri, finalInit);
 
           setResult(result);
-          setData(await result.data);
+          doFetch[1]?.(result);
+
+          const localData = await result.data;
+          setData(localData);
+
           if (result.abortController.signal.aborted) {
             setStatus(FetchpStatus.CANCELED);
           } else {
@@ -66,6 +80,7 @@ const useFetchpBuilder = function useFetchpBuilder(
           }
         } catch (error) {
           setError(error);
+          doFetch[2]?.(error);
           console.error(error);
           setStatus(FetchpStatus.ERROR);
         }
@@ -75,15 +90,16 @@ const useFetchpBuilder = function useFetchpBuilder(
     }, [doFetch]);
 
     return {
-      doFetch: () => setDoFetch(true),
+      doFetch: (init?: FetchpRequestInit) =>
+        new Promise((resolve, reject) => setDoFetch([init, resolve, reject])),
       data,
       status,
-      isIdle: (status === FetchpStatus.IDLE),
-      isFetching: (status === FetchpStatus.FETCHING),
-      isLoading: (status === FetchpStatus.LOADING),
-      isError: (status === FetchpStatus.ERROR),
-      isCanceled: (status === FetchpStatus.CANCELED),
-      isSuccess: (status === FetchpStatus.SUCCESS),
+      isIdle: status === FetchpStatus.IDLE,
+      isFetching: status === FetchpStatus.FETCHING,
+      isLoading: status === FetchpStatus.LOADING,
+      isError: status === FetchpStatus.ERROR,
+      isCanceled: status === FetchpStatus.CANCELED,
+      isSuccess: status === FetchpStatus.SUCCESS,
       error,
       result,
     };

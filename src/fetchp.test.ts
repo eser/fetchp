@@ -2,16 +2,16 @@ import { fetchp, FetchpHookType, FetchpStatus } from "./fetchp.ts";
 import { asserts, mock } from "./deps-external.ts";
 
 Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
-  await t.step("baseUrl setter", () => {
-    fetchp.setBaseUrl("http://localhost/");
+  await t.step("baseUri setter", () => {
+    fetchp.setBaseUri("http://localhost/");
 
-    asserts.assertEquals(fetchp.baseUrl, "http://localhost/");
+    asserts.assertEquals(fetchp.baseUri, "http://localhost/");
 
-    fetchp.setBaseUrl(undefined);
+    fetchp.setBaseUri(undefined);
   });
 
-  await t.step("baseUrl transformer", async () => {
-    fetchp.setBaseUrl("https://jsonplaceholder.typicode.com");
+  await t.step("baseUri transformer", async () => {
+    fetchp.setBaseUri("https://jsonplaceholder.typicode.com");
 
     const res1 = fetchp.request("GET", "/posts");
     const res2 = fetchp.request("GET", "http://www.google.com");

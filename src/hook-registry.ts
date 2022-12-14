@@ -1,7 +1,8 @@
 import {
+  type FetchpURI,
   UrlCollection,
   type UrlCollectionInterface,
-} from "./url-collection.ts";
+} from "./uris.ts";
 
 // interface definitions
 // ---------------------
@@ -29,7 +30,7 @@ interface HookRegistryInterface {
   addForUrl(
     hookType: FetchpHookType,
     methods: string | string[],
-    requestUrlPattern: string | RegExp,
+    requestUrlPattern: string | RegExp | URLPattern,
     func: FetchpHookFn,
   ): void;
   clear(): void;
@@ -42,7 +43,7 @@ interface HookRegistryInterface {
   callHooksWithRequest(
     hookType: FetchpHookType,
     request: Request | undefined,
-    urlConverter: ((url: string) => URL) | undefined,
+    urlConverter: ((uri: FetchpURI) => URL) | undefined,
     // deno-lint-ignore no-explicit-any
     ...params: any[]
   ): Promise<undefined>;
@@ -72,7 +73,7 @@ class HookRegistry implements HookRegistryInterface {
   addForUrl(
     hookType: FetchpHookType,
     methods: string | string[],
-    requestUrlPattern: string | RegExp,
+    requestUrlPattern: string | RegExp | URLPattern,
     func: FetchpHookFn,
   ) {
     this.internalEnsureHookItemExists(hookType);
@@ -99,7 +100,7 @@ class HookRegistry implements HookRegistryInterface {
   async callHooksWithRequest(
     hookType: FetchpHookType,
     request: Request | undefined,
-    urlConverter: ((url: string) => URL) | undefined,
+    urlConverter: ((uri: FetchpURI) => URL) | undefined,
     // deno-lint-ignore no-explicit-any
     ...params: any[]
   ) {
