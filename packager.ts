@@ -30,7 +30,7 @@ await build({
     // shims DOMException
     domException: false,
     // shims fetch, File, FormData, Headers, Request, and Response
-    undici: true,
+    undici: false,
     // shams (checker) for the global.WeakRef, helps type-checking only
     weakRef: false,
     // shims WebSocket
