@@ -18,16 +18,10 @@
     "interceptor",
     "middleware"
   ],
-  "version": "0.0.42",
+  "version": "0.0.43",
   "homepage": "https://github.com/eserozvataf/fetchp#readme",
   "scripts": {
-    "test": "deno test ./src/ --allow-net --coverage=./etc/coverage",
-    "test:coverage": "deno coverage ./etc/coverage",
-    "test:generate-lcov": "deno coverage ./etc/coverage --lcov > ./etc/coverage/cov_profile.lcov",
-    "bench": "deno bench ./src/ --unstable",
-    "cleanup": "rm -rf ./dist/ yarn.lock package-lock.json",
-    "build": "deno run -A packager.ts",
-    "pub": "deno task build && npm publish dist/"
+    "cleanup": "rm -rf ./node_modules/ ./yarn.lock ./package-lock.json"
   },
   "author": "Eser Ozvataf <eser@ozvataf.com>",
   "contributors": [
@@ -45,6 +39,9 @@
     "url": "https://github.com/eserozvataf/fetchp/issues"
   },
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "exports": {
     "./package.json": {
       "import": "./esm/package.json",

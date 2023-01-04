@@ -44,5 +44,8 @@
     "**/.hg/store/**": true,
     "dist/**": true,
     "etc/coverage/**": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
   }
 }

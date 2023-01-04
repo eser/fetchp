@@ -53,7 +53,7 @@ Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
     fetchp.mocks.clear();
   });
 
-  await t.step("hooks: BuildRequestHeaders", async () => {
+  await t.step("hooks: BuildRequestHeaders Call", async () => {
     const hookSpyFn = mock.spy();
 
     fetchp.hooks.add(FetchpHookType.BuildRequestHeaders, hookSpyFn);
@@ -65,6 +65,24 @@ Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
 
     asserts.assertExists(await response.data);
     mock.assertSpyCalls(hookSpyFn, 1);
+
+    fetchp.hooks.clear();
+  });
+
+  await t.step("hooks: BuildRequestHeaders Build", async () => {
+    const hookFn = (headers: Headers) => {
+      headers.set("X-Test", "test");
+    };
+
+    fetchp.hooks.add(FetchpHookType.BuildRequestHeaders, hookFn);
+
+    const response = fetchp.request(
+      "GET",
+      "https://jsonplaceholder.typicode.com/todos",
+    );
+
+    asserts.assertExists(await response.data);
+    asserts.assertEquals(response.request?.headers.get("X-Test"), "test");
 
     fetchp.hooks.clear();
   });

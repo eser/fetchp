@@ -8,15 +8,15 @@ import {
   FetchpStatus,
 } from "./fetchp.ts";
 
-const useFetchpBuilder = function useFetchpBuilder(
+const useFetchpBuilder = (
   fetchpInstance: FetchpInterface,
-) {
+) => {
   // deno-lint-ignore no-explicit-any
-  return function useFetchp<T = any>(
+  const useFetchp = <T = any>(
     method: string,
     uri: FetchpURI,
     init?: FetchpRequestInit,
-  ) {
+  ) => {
     const [data, setData] = React.useState<T>();
     const [status, setStatus] = React.useState<FetchpStatus>(FetchpStatus.IDLE);
     // deno-lint-ignore no-explicit-any
@@ -36,7 +36,7 @@ const useFetchpBuilder = function useFetchpBuilder(
         return;
       }
 
-      const fetchData = async function fetchData() {
+      const fetchData = async () => {
         // try {
         //   const result = fetchpInstance.request<T>(method, uri, {
         //     ...(init ?? {}),
@@ -104,6 +104,8 @@ const useFetchpBuilder = function useFetchpBuilder(
       result,
     };
   };
+
+  return useFetchp;
 };
 
 const useFetchp = useFetchpBuilder(fetchp);

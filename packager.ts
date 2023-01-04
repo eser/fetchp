@@ -1,4 +1,4 @@
-import { build, emptyDir } from "https://deno.land/x/dnt@0.32.0/mod.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.32.1/mod.ts";
 import packageJson from "./package.json" assert { type: "json" };
 import denoJson from "./deno.json" assert { type: "json" };
 
@@ -18,7 +18,9 @@ await build({
   importMap: denoJson.importMap,
   shims: {
     // see JS docs for overview and more options
-    deno: false,
+    deno: {
+      test: "dev",
+    },
     // replaces node.js timers with browser-API compatible ones
     timers: true,
     // the global confirm, alert, and prompt functions
@@ -50,7 +52,7 @@ await build({
   //   },
   // },
   typeCheck: true,
-  test: false,
+  test: true,
   declaration: true,
   compilerOptions: {
     // importHelpers: tsconfigJson?.compilerOptions?.importHelpers,
