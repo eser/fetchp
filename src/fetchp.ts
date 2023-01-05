@@ -45,7 +45,7 @@ interface FetchpResultInterface<T = any> {
   readonly error: any;
   readonly data: Promise<T | undefined>;
 
-  exec(): FetchpResultInterface<T>;
+  exec(init?: FetchpRequestInit): FetchpResultInterface<T>;
 }
 
 interface FetchpInterface {
@@ -441,18 +441,14 @@ class Fetchp implements FetchpInterface {
 
   // deno-lint-ignore no-explicit-any
   request<T = any>(method: string, uri: FetchpURI, init?: FetchpRequestInit) {
-    const url_ = this.internalUrlConverter(uri, init?.uriParams);
-
-    const headers = new Headers(init?.headers);
-    if (!headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json");
-    }
-
     const abortController = new AbortController();
     const [awaiterResolve, awaiter] = this.internalAwaiterGenerator<
       Response | undefined
     >();
 
+    let init_: FetchpRequestInit = init ?? {};
+    let url_: URL;
+    let headers: Headers;
     let status = FetchpStatus.IDLE;
     // deno-lint-ignore no-explicit-any
     let error: any;
@@ -460,10 +456,18 @@ class Fetchp implements FetchpInterface {
 
     // -- REQUEST PART -- //
     const promise = awaiter
+      .then(() => {
+        url_ = this.internalUrlConverter(uri, init_.uriParams);
+
+        headers = new Headers(init_.headers);
+        if (!headers.has("Content-Type")) {
+          headers.set("Content-Type", "application/json");
+        }
+      })
       .then(() =>
         this.internalRequestStep1InitHeaders(
           headers,
-          init,
+          init_,
           (newStatus) => (status = newStatus),
         )
       )
@@ -472,7 +476,7 @@ class Fetchp implements FetchpInterface {
           method,
           url_,
           headers,
-          init,
+          init_,
           abortController,
           (newStatus, newRequest) => {
             status = newStatus;
@@ -499,7 +503,7 @@ class Fetchp implements FetchpInterface {
         this.internalRequestStep5ExecuteRequest(
           req,
           res,
-          init,
+          init_,
           abortController,
           (newStatus) => (status = newStatus),
         )
@@ -523,7 +527,7 @@ class Fetchp implements FetchpInterface {
           req,
           res,
           err,
-          init,
+          init_,
           abortController,
           (newStatus) => (status = newStatus),
         )
@@ -534,7 +538,7 @@ class Fetchp implements FetchpInterface {
           req,
           res,
           err,
-          init,
+          init_,
           (newStatus, newError) => {
             status = newStatus;
             error = newError;
@@ -564,7 +568,8 @@ class Fetchp implements FetchpInterface {
         return data;
       },
 
-      exec: () => {
+      exec: (init?: FetchpRequestInit) => {
+        init_ = { ...init_, ...(init ?? {}) };
         awaiterResolve(undefined);
 
         return result;

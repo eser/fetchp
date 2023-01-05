@@ -1,4 +1,4 @@
-import { React } from "./deps-external.ts";
+import React from "npm:react";
 import { type FetchpURI } from "./uris.ts";
 import {
   fetchp,

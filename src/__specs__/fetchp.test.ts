@@ -1,5 +1,5 @@
-import { fetchp, FetchpHookType, FetchpStatus } from "./fetchp.ts";
-import { asserts, mock } from "./deps-external.ts";
+import { fetchp, FetchpHookType, FetchpStatus } from "../fetchp.ts";
+import { asserts, mock } from "./deps.ts";
 
 Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
   await t.step("baseUri setter", () => {
@@ -29,6 +29,16 @@ Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
       res2.request?.url.toString(),
       "http://www.google.com/",
     );
+  });
+
+  await t.step("dynamic uri", async () => {
+    const response = fetchp.request(
+      "GET",
+      (params) => `https://jsonplaceholder.typicode.com/${params?.path}`,
+      { uriParams: { path: "posts" } },
+    );
+
+    asserts.assertExists(await response.data);
   });
 
   await t.step("mocks: basic", async () => {
@@ -141,6 +151,25 @@ Deno.test("fetchp", { permissions: { net: true } }, async (t) => {
     asserts.assertStrictEquals(response.status, FetchpStatus.IDLE);
 
     setTimeout(() => response.exec(), 500);
+
+    asserts.assertExists(await response.data);
+    asserts.assert((await response.data).length >= 10);
+    asserts.assertStrictEquals(response.status, FetchpStatus.SUCCESS);
+  });
+
+  await t.step("disable immediate w/ dynamic uri", async () => {
+    const response = fetchp.request(
+      "GET",
+      (params) => `https://jsonplaceholder.typicode.com/${params?.path}`,
+      {
+        immediate: false,
+      },
+    );
+
+    // asserts.assertEquals(await response.data, undefined);
+    asserts.assertStrictEquals(response.status, FetchpStatus.IDLE);
+
+    setTimeout(() => response.exec({ uriParams: { path: "posts" } }), 500);
 
     asserts.assertExists(await response.data);
     asserts.assert((await response.data).length >= 10);
