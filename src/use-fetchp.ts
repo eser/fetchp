@@ -91,7 +91,9 @@ const useFetchpBuilder = (
 
     return {
       doFetch: (init?: FetchpRequestInit) =>
-        new Promise((resolve, reject) => setDoFetch([init, resolve, reject])),
+        new Promise<T>((resolve, reject) =>
+          setDoFetch([init, resolve, reject])
+        ),
       data,
       status,
       isIdle: status === FetchpStatus.IDLE,
